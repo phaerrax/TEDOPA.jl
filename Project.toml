@@ -3,5 +3,12 @@ uuid = "b335cece-bf51-4f8f-ae23-b29b889c1946"
 authors = ["Davide Ferracin <davide.ferracin@protonmail.com> and contributors"]
 version = "0.1.0"
 
+[deps]
+CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
+DataFrames = "a93c6f00-e57d-5684-b7b6-d8193f3e46c0"
+Measures = "442fdcdd-2543-5da2-b0f3-8c86c306513e"
+PolyChaos = "8d666b04-775d-5f6e-b778-5ac7c70f65a3"
+QuadGK = "1fd47b50-473d-5c70-9696-f719f8f3bcdc"
+
 [compat]
 julia = "1"

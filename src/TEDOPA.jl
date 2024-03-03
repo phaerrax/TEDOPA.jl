@@ -1,5 +1,13 @@
 module TEDOPA
 
-# Write your package code here.
+using Measures
+using PolyChaos
+using QuadGK
+using DataFrames
+using CSV
+
+export getchaincoefficients, thermalisedJ, chainmapcoefficients
+
+include("tedopa.jl")
 
 end
