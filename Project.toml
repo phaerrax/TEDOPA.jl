@@ -1,0 +1,7 @@
+name = "TEDOPA"
+uuid = "b335cece-bf51-4f8f-ae23-b29b889c1946"
+authors = ["Davide Ferracin <davide.ferracin@protonmail.com> and contributors"]
+version = "0.1.0"
+
+[compat]
+julia = "1"

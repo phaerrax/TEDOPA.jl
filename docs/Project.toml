@@ -1,0 +1,3 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+TEDOPA = "b335cece-bf51-4f8f-ae23-b29b889c1946"
