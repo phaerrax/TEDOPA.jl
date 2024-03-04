@@ -7,11 +7,8 @@ makedocs(;
     modules=[TEDOPA],
     authors="Davide Ferracin <davide.ferracin@protonmail.com> and contributors",
     sitename="TEDOPA.jl",
-    format=Documenter.HTML(;
-        edit_link="main",
-        assets=String[],
-    ),
-    pages=[
-        "Home" => "index.md",
-    ],
+    repo=Remotes.GitHub("phaerrax", "TEDOPA.jl"),
+    format=Documenter.HTML(; edit_link="github"),
+    pages=["Home" => "index.md"],
+    checkdocs=:none,
 )
