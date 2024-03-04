@@ -4,10 +4,10 @@ function chainmapping_thermofield(file::AbstractString)
         return JSON.parse(s)
     end
     sd_info = merge(p, Dict("filename" => file))
-    chainmapping_thermofield(sd_info)
+    return chainmapping_thermofield(sd_info)
 end
 
-function chainmapping_thermofield(sd_info::Dict{<:AbstractString, Any})
+function chainmapping_thermofield(sd_info::Dict{<:AbstractString,Any})
     # Parse the spectral density function given in the info file.
     sdfs = []
     for d in sd_info["environments"]
@@ -62,7 +62,6 @@ function chainmapping_thermofield(sd_info::Dict{<:AbstractString, Any})
 
     # (We assume that the energies in the free environment Hamiltonians have already
     # been shifted with the chemical potentials. We won't do that here.)
-    output_filename = replace(sd_info["filename"], ".json" => ".thermofield")
 
     if !issingleton(merged_empty_domains) && !issingleton(merged_filled_domains)
         (freqempty, coupempty, sysintempty) = chainmapcoefficients(
@@ -78,14 +77,12 @@ function chainmapping_thermofield(sd_info::Dict{<:AbstractString, Any})
             Nquad=sd_info["PolyChaos_nquad"],
         )
 
-        open(output_filename, "w") do output
-            writedlm(output, ["coupempty" "coupfilled" "freqempty" "freqfilled"], ',')
-            writedlm(
-                output,
-                [[sysintempty; coupempty] [sysintfilled; coupfilled] freqempty freqfilled],
-                ',',
-            )
-        end
+        return (
+            coupempty=[sysintempty; coupempty],
+            coupfilled=[sysintfilled; coupfilled],
+            freqempty=freqempty,
+            freqfilled=freqfilled,
+        )
     elseif issingleton(merged_empty_domains)
         (freqfilled, coupfilled, sysintfilled) = chainmapcoefficients(
             merged_sdffilled,
@@ -94,10 +91,7 @@ function chainmapping_thermofield(sd_info::Dict{<:AbstractString, Any})
             Nquad=sd_info["PolyChaos_nquad"],
         )
 
-        open(output_filename, "w") do output
-            writedlm(output, ["coupfilled" "freqfilled"], ',')
-            writedlm(output, [[sysintfilled; coupfilled] freqfilled], ',')
-        end
+        return (coupfilled=[sysintfilled; coupfilled], freqfilled=freqfilled)
     elseif issingleton(merged_filled_domains)
         (freqempty, coupempty, sysintempty) = chainmapcoefficients(
             merged_sdfempty,
@@ -106,13 +100,8 @@ function chainmapping_thermofield(sd_info::Dict{<:AbstractString, Any})
             Nquad=sd_info["PolyChaos_nquad"],
         )
 
-        open(output_filename, "w") do output
-            writedlm(output, ["coupempty" "freqempty"], ',')
-            writedlm(output, [[sysintempty; coupempty] freqempty], ',')
-        end
+        return (coupempty=[sysintempty; coupempty], freqempty=freqempty)
     else  # Both merged domains are singletons. There is no output.
         error("Both merged domains are empty. Please check the input spectral densities.")
     end
-
-    return nothing
 end

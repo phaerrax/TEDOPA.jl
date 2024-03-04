@@ -29,10 +29,10 @@ function chainmapping_tftedopa(file::AbstractString)
         p = JSON.parse(s)
     end
     sd_info = merge(p, Dict("filename" => file))
-    chainmapping_tftedopa(sd_info)
+    return chainmapping_tftedopa(sd_info)
 end
 
-function chainmapping_tftedopa(sd_info::Dict{<:AbstractString, Any})
+function chainmapping_tftedopa(sd_info::Dict{<:AbstractString,Any})
     # Parse the spectral density function given in the info file.
     fn = sd_info["spectral_density"]
     tmp = eval(Meta.parse("(a, x) -> " * fn))
@@ -95,10 +95,5 @@ function chainmapping_tftedopa(sd_info::Dict{<:AbstractString, Any})
         )
     end
 
-    open(replace(sd_info["filename"], ".json" => ".tedopa"), "w") do output
-        writedlm(output, ["couplings" "frequencies"], ',')
-        writedlm(output, [[η; κ] Ω], ',')
-    end
-
-    return nothing
+    return (couplings=[η; κ], frequencies=Ω)
 end

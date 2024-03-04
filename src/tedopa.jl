@@ -69,7 +69,7 @@ function getchaincoefficients(envparameters)
             )
         end
     end
-    return Ω, κ, η
+    return (frequencies=Ω, couplings=[η; κ])
 end
 
 """
