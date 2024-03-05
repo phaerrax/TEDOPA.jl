@@ -1,97 +1,47 @@
 """
-    getchaincoefficients(envparameters)
+    chainmapping_tedopa(parameters::Dict{AbstractString, Any})
 
-Return the Ω, η, κ coefficients of the T-TEDOPA chain, from the information given
-in the `envparameters` dictionary.
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment specified by the `envparameters` dictionary.
+
+# Example
+```julia-repl
+julia> env = Dict(
+    "domain" => [0, 2],
+    "spectral_density_parameters" => [1, 0.5],
+    "spectral_density_function" => "sqrt((2a[2]-a[1]+x)*(2a[2]+a[1]-x))",
+);
+julia> p = Dict(
+    "environment" => env,
+    "number_of_oscillators" => 200,
+    "PolyChaos_nquad" => 5000,
+);
+julia> chainmapping_tedopa(p)
+(frequencies = [1.0000000000000004, …, 1.000000000000001], couplings = [0.22360679783266632, …, 0.49999999955894253])
+```
 """
-function getchaincoefficients(envparameters)
-    n_osc = envparameters["number_of_oscillators"]
-    # There are two possible cases here, according to the parameters in the JSON
-    # files:
-    # 1) if there is an entry "X_chain_coefficients_file" (where "X" can be "left"
-    #    or "right"), then we read the coefficients from that file.
-    # 2) if a specific spectral density is described through the entries
-    #    "spectral_density_parameters" and "…_function", we compute the T-TEDOPA
-    #    coefficients as usual.
-    # A mixed-type situation in which one bath is given by a file and the other
-    # by a spectral density is allowed: they are completely independent.
-    # What is 𝑛𝑜𝑡 allowed, is putting in the JSON file both a coefficient file
-    # and a spectral density: in this case, an error is thrown.
-    if (
-        haskey(envparameters, "chain_coefficients_file") &&
-        !haskey(envparameters, "spectral_density_function")
-    )
-        ccoeffs = DataFrame(CSV.File(envparameters["chain_coefficients_file"]))
-        if size(ccoeffs, 1) ≥ n_osc
-            # If >, then excess coefficients are ignored.
-            # If =, all coefficients are taken into account.
-            # If <, there aren't enough coefficients to fill the sites, and an error
-            # is thrown.
-            # TODO: study the case n_osc == 1
-            Ω = ccoeffs[1:n_osc, :loc]
-            η = ccoeffs[1, :int]
-            κ = ccoeffs[2:n_osc, :int]
-        else
-            error(
-                "File $(envparameters["chain_coefficients_file"]) does " *
-                "not contain enough coefficients.",
-            )
-        end
-    elseif (
-        !haskey(envparameters, "chain_coefficients_file") &&
-        haskey(envparameters, "spectral_density_function")
-    )
-        # The code which creates a function from a String is taken from
-        # https://stackoverflow.com/a/53134127/4160978 
-        fn = envparameters["spectral_density_function"]
-        tmp = eval(Meta.parse("(a, x) -> " * fn))
-        sdf = x -> Base.invokelatest(tmp, envparameters["spectral_density_parameters"], x)
+function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
+    n_osc = parameters["number_of_oscillators"]
+    environment = parameters["environment"]
 
-        ωc = envparameters["frequency_cutoff"]
-        T = envparameters["temperature"]
+    # The code which creates a function from a String is taken from
+    # https://stackoverflow.com/a/53134127/4160978 
+    fn = environment["spectral_density_function"]
+    tmp = eval(Meta.parse("(a, x) -> " * fn))
+    sdf = x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)
 
-        if T == 0
-            Ω, κ, η = chainmapcoefficients(
-                sdf,
-                (0, ωc),
-                n_osc - 1;
-                Nquad=envparameters["PolyChaos_nquad"],
-                discretization=lanczos,
-            )
-        else
-            sdf_thermalised = ω -> thermalisedJ(sdf, ω, T)
-            Ω, κ, η = chainmapcoefficients(
-                sdf_thermalised,
-                (-ωc, 0, ωc),
-                n_osc - 1;
-                Nquad=envparameters["PolyChaos_nquad"],
-                discretization=lanczos,
-            )
-        end
-    end
-    return (frequencies=Ω, couplings=[η; κ])
+    cm_freqs, cm_coups, cm_syscoup = chainmapping(
+        sdf,
+        sort(environment["domain"]),
+        n_osc - 1;
+        Nquad=parameters["PolyChaos_nquad"],
+        discretization=lanczos,
+    )
+    return (frequencies=cm_freqs, couplings=[cm_syscoup; cm_coups])
 end
 
 """
-    thermalisedJ(J::Function, ω::Real, T::Real)
-
-Create a thermalised spectral function from `J`, at the temperature
-`T`, then return its value at `ω`.
-"""
-function thermalisedJ(J::Function, ω::Real, T::Real)
-    if T == 0
-        # In this case we could write f=1 and be done with it, but instead we choose
-        # this more articulated way so that even if the caller doesn't already
-        # exclude (-∞,0) from the support, we do it ourselves now.
-        f = ω > 0 ? one(ω) : zero(ω)
-    else
-        f = 0.5(1 + coth(0.5 * ω / T))
-    end
-    return f * sign(ω) * J(abs(ω))
-end
-
-"""
-    chainmapcoefficients(J::Function, support, L::Int; kwargs...)
+    chainmapping(J::Function, support, L::Int; kwargs...)
 
 Compute the first `L` coefficients of the chain-map Hamiltonian obtained from
 the spectral density `J` defined over `support`.
@@ -127,7 +77,7 @@ The chain coefficients are then given by
 - ``κᵢ = \\sqrt{βᵢ₊₁}``, with ``i\\in\\{1,\\dotsc,L-1\\}``,
 while `η` is the integral of `J` over its support.
 """
-function chainmapcoefficients(J::Function, support, L::Int; kwargs...)
+function chainmapping(J::Function, support, L::Int; kwargs...)
     measure = PolyChaos.Measure("measure", J, (support[begin], support[end]), false, Dict())
     # We give `lanczos` as a default discretization method; if the user explicitly supplies a
     # discretization within the keyword arguments, then this default is overwritten.

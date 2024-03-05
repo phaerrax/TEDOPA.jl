@@ -8,9 +8,13 @@ using CSV
 using DelimitedFiles
 using JSON
 
-export getchaincoefficients, thermalisedJ, chainmapcoefficients
+export chainmapping, chainmapping_tedopa
 
 include("tedopa.jl")
+
+export chainmapping_ttedopa, thermalisedJ
+
+include("ttedopa.jl")
 
 export chainmapping_thermofield
 
