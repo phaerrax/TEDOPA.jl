@@ -12,7 +12,7 @@ export chainmapping, chainmapping_tedopa
 
 include("tedopa.jl")
 
-export chainmapping_ttedopa, thermalisedJ
+export chainmapping_ttedopa
 
 include("ttedopa.jl")
 
