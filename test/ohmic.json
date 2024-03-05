@@ -1,0 +1,10 @@
+{
+    "environment": {
+        "spectral_density_parameters": [1, 2],
+        "spectral_density_function": "x * (x/a[1])^(a[2]) * exp(-x/a[1])",
+        "domain": [0, 10],
+        "temperature": 10
+    },
+    "number_of_oscillators": 50,
+    "PolyChaos_nquad": 5000
+}
