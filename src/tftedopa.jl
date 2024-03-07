@@ -1,26 +1,37 @@
-function tedopaTμtransform(J::Function, ω::Real, ωmax::Real, T::Real, μ::Real)::Real
-    thermalfactor = 0.5(1 + tanh(0.5ω / T))
-    if ωmax > 2μ
-        if -ωmax + μ < ω < -μ
-            return thermalfactor * J(μ - ω)
-        elseif -μ ≤ ω ≤ μ
-            return thermalfactor * (J(μ + ω) + J(μ - ω))
-        elseif μ < ω < ωmax - μ
-            return thermalfactor * J(μ + ω)
-        else
-            return zero(ω)
-        end
+function indicator(x, lb, rb)
+    return lb <= x <= rb ? one(x) : zero(x)
+end
+
+function indicator(x, domain)
+    return indicator(x, first(domain), last(domain))
+end
+
+function tftedopa_sdf_transform(J::Function, domain, T, μ)
+    domain_neg = reverse(-domain) .+ μ
+    domain_pos = domain .- μ
+    extendeddomain = unique(sort([domain_neg; domain_pos]))
+
+    if T == 0  # Cut off part of domain where new_J is zero (ω < 0)
+        newdomain = [0; filter(>(0), extendeddomain)]
+        newJ =
+            ω -> (
+                if ω >= 0
+                    (indicator(ω, domain_neg) * J(μ - ω) + indicator(x, domain_pos) * J(μ + ω))
+                else
+                    0
+                end
+            )
     else
-        if -μ < ω < -ωmax + μ
-            return thermalfactor * J(μ - ω)
-        elseif -ωmax + μ ≤ ω ≤ ωmax - μ
-            return thermalfactor * (J(μ + ω) + J(μ - ω))
-        elseif ωmax - μ < ω < μ
-            return thermalfactor * J(μ + ω)
-        else
-            return zero(ω)
-        end
+        newdomain = extendeddomain
+        newJ =
+            ω -> (
+                0.5(1 + tanh(0.5ω / T)) * (
+                    indicator(ω, domain_neg) * J(μ - ω) +
+                    indicator(x, domain_pos) * J(μ + ω)
+                )
+            )
     end
+    return (newdomain, newJ)
 end
 
 function chainmapping_tftedopa(file::AbstractString)
@@ -32,68 +43,44 @@ function chainmapping_tftedopa(file::AbstractString)
     return chainmapping_tftedopa(sd_info)
 end
 
-function chainmapping_tftedopa(sd_info::Dict{<:AbstractString,Any})
-    # Parse the spectral density function given in the info file.
-    fn = sd_info["spectral_density"]
+"""
+    chainmapping_tftedopa(parameters::Dict{<:AbstractString, Any})
+
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment specified by the `envparameters` dictionary, after transforming it into a
+`T=0` and `μ=0` environment through the TF-TEDOPA algorithm.
+
+See [`chainmapping_tedopa`](@ref) for more information.
+"""
+function chainmapping_tftedopa(parameters::Dict{<:AbstractString,Any})
+    chain_length = parameters["number_of_oscillators"]
+    environment = parameters["environment"]
+
+    fn = parameters["spectral_density"]
     tmp = eval(Meta.parse("(a, x) -> " * fn))
-    sdf = x -> tmp(sd_info["parameters"], x)
+    sdf = x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)
 
-    # Do the same for its Fourier transform. Be careful not to reuse the same temporary
-    # names for the variables: in some way, the function `sdf` above is not yet fixed,
-    # so if we redefine `fn` and `tmp` to build the Fourier transform too the same `fn`
-    # and `tmp` will end up in the previous `sdf`.
-    fn_ft = sd_info["spectral_density_ft"]
-    tmp_ft = eval(Meta.parse("(a, x) -> " * fn_ft))
-    sdf_ft = x -> tmp_ft(sd_info["parameters"], x)
-
-    domain = sd_info["domain"]
-    ωmax = last(domain)
-    chain_length = sd_info["number_of_oscillators"]
-
-    # Compute the ftTEDOPA coefficients from the spectral density.
-    T = sd_info["temperature"]
-    μ = sd_info["chemical_potential"]
-    if T == 0 && μ == 0
-        # Straight TEDOPA.
-        (Ω, κ, η) = chainmapcoefficients(
-            sdf, domain, chain_length - 1; Nquad=sd_info["PolyChaos_nquad"]
-        )
-    elseif μ == 0 # but T > 0
-        # We use the usual thermalized spectral density function.
-        (Ω, κ, η) = chainmapcoefficients(
-            ω -> tedopaTμtransform(sdf, ω, ωmax, T, 0),
-            (-ωmax, 0, ωmax),
-            chain_length - 1;
-            Nquad=sd_info["PolyChaos_nquad"],
-        )
-    elseif T == 0 # but μ ≥ 0
-        # If T == 0 the transformed sdf is identically zero for ω < 0, so we need to
-        # cut that part of the domain off; otherwise, it is not Szegő class and the
-        # coefficients don't converge.
-        if -ωmax + μ < -μ
-            domainTμ = (0, μ, ωmax - μ)
-        else
-            domainTμ = (0, ωmax - μ, μ)
-        end
-        (Ω, κ, η) = chainmapcoefficients(
-            ω -> tedopaTμtransform(sdf, ω, ωmax, 0, μ),
-            domainTμ,
-            chain_length - 1;
-            Nquad=sd_info["PolyChaos_nquad"],
-        )
-    else # T ≥ 0 and μ ≥ 0
-        if -ωmax + μ < -μ
-            domainTμ = (-ωmax + μ, -μ, 0, μ, ωmax - μ)
-        else
-            domainTμ = (-μ, -ωmax + μ, 0, ωmax - μ, μ)
-        end
-        (Ω, κ, η) = chainmapcoefficients(
-            ω -> tedopaTμtransform(sdf, ω, ωmax, T, μ),
-            domainTμ,
-            chain_length - 1;
-            Nquad=sd_info["PolyChaos_nquad"],
+    domain = environment["domain"]
+    T = environment["temperature"]
+    μ = environment["chemical_potential"]
+    # If [a,b] is the support of the original spectral density, the transformed one will
+    # be supported on [μ-b, μ-a] ∪ [a-μ,b-μ]. This set must not contain a gap if we want the
+    # new function to be in the Szegő class, so it is necessary that a ≤ μ ≤ b.
+    if μ < first(domain) || μ > last(domain)
+        throw(
+            DomainError(
+                "the spectral function: the chemical potential must lie inside the domain"
+            ),
         )
     end
 
-    return (couplings=[η; κ], frequencies=Ω)
+    cm_freqs, cm_coups, cm_syscoup = if T == 0 && μ == 0
+        # Normal TEDOPA: it's simpler.
+        chainmapping(sdf, domain, chain_length - 1; Nquad=parameters["PolyChaos_nquad"])
+    else
+        newJ, newdomain = tftedopa_sdf_transform(sdf, domain, T, μ)
+        chainmapping(newJ, newdomain, chain_length - 1; Nquad=parameters["PolyChaos_nquad"])
+    end
+
+    return (frequencies=cm_freqs, couplings=[cm_syscoup; cm_coups])
 end

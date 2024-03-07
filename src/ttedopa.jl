@@ -5,13 +5,13 @@ function boson_thermal_factor(x, T)
         # exclude (-∞,0) from the support, we do it ourselves now.
         f = x > 0 ? one(x) : zero(x)
     else
-        f = 1/2 * (1 + coth(0.5 * x / T))
+        f = 1 / 2 * (1 + coth(0.5 * x / T))
     end
     return f
 end
 
 """
-    chainmapping_ttedopa(parameters::Dict{AbstractString, Any})
+    chainmapping_ttedopa(parameters::Dict{<:AbstractString, Any})
 
 Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
 environment specified by the `envparameters` dictionary, after a thermalization procedure.
