@@ -1,0 +1,20 @@
+{
+    "environment": [
+        {
+            "spectral_density_parameters": [],
+            "spectral_density_function": "1/(pi*200)",
+            "domain": [-100, 100],
+            "temperature": 0,
+            "chemical_potential": 0.01
+        },
+        {
+            "spectral_density_parameters": [1],
+            "spectral_density_function": "a[1]/(pi*200)",
+            "domain": [-100, 100],
+            "temperature": 0,
+            "chemical_potential": -0.01
+        }
+    ],
+    "chain_length": 200,
+    "PolyChaos_nquad": 5000
+}
