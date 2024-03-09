@@ -1,8 +1,37 @@
 """
-    chainmapping_tedopa(parameters::Dict{AbstractString, Any})
+    chainmapping_tedopa(file::IOStream)
 
 Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment specified by the `envparameters` dictionary.
+environment described in the JSON file `file`.
+
+See [`chainmapping_tedopa`](@ref) for more information.
+"""
+function chainmapping_tedopa(file::IOStream)
+    s = read(file, String)
+    p = JSON.parse(s)
+    parameters = merge(p, Dict("filename" => file))
+    return chainmapping_tedopa(parameters)
+end
+
+"""
+    chainmapping_tedopa(filename::AbstractString)
+
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment described in the JSON file called `filename`.
+
+See [`chainmapping_tedopa`](@ref) for more information.
+"""
+function chainmapping_tedopa(filename::AbstractString)
+    return open(filename, "r") do inputfile
+        chainmapping_tedopa(inputfile)
+    end
+end
+
+"""
+    chainmapping_tedopa(parameters::Dict{<:AbstractString, Any})
+
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment specified by the `parameters` dictionary.
 
 # Example
 ```julia-repl
@@ -17,7 +46,10 @@ julia> p = Dict(
     "PolyChaos_nquad" => 5000,
 );
 julia> chainmapping_tedopa(p)
-(frequencies = [1.0000000000000004, …, 1.000000000000001], couplings = [0.22360679783266632, …, 0.49999999955894253])
+(
+    frequencies=[1.0000000000000004, …, 1.000000000000001],
+    couplings=[0.22360679783266632, …, 0.49999999955894253],
+)
 ```
 """
 function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})

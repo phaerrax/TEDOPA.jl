@@ -1,14 +1,36 @@
-function chainmapping_thermofield(file::AbstractString)
-    p = open(file) do inp
-        s = read(inp, String)
-        return JSON.parse(s)
-    end
+function issingleton(domain)
+    return minimum(d) == maximum(d)
+end
+
+"""
+    chainmapping_thermofield(file::IOStream)
+
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment described in the JSON file `file`, after transforming it into a
+`T=0` and `μ=0` environment through the thermofield procedure.
+
+See [`chainmapping_tedopa`](@ref) for more information.
+"""
+function chainmapping_thermofield(file::IOStream)
+    s = read(file, String)
+    p = JSON.parse(s)
     parameters = merge(p, Dict("filename" => file))
     return chainmapping_thermofield(parameters)
 end
 
-function issingleton(domain)
-    return minimum(d) == maximum(d)
+"""
+    chainmapping_thermofield(filename::AbstractString)
+
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment described in the JSON file called `filename`, after transforming it into a
+`T=0` and `μ=0` environment through the thermofield procedure.
+
+See [`chainmapping_tedopa`](@ref) for more information.
+"""
+function chainmapping_thermofield(filename::AbstractString)
+    return open(filename, "r") do inputfile
+        chainmapping_thermofield(inputfile)
+    end
 end
 
 """
@@ -16,7 +38,7 @@ end
 
 Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
 environment specified by the `parameters` dictionary, after transforming it into a
-`T=0` and `μ=0` environment through the TF-TEDOPA algorithm.
+`T=0` and `μ=0` environment through the thermofield procedure.
 
 See [`chainmapping_tedopa`](@ref) for more information.
 """

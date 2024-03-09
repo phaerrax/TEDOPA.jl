@@ -34,20 +34,42 @@ function tftedopa_sdf_transform(J::Function, domain, T, μ)
     return (newdomain, newJ)
 end
 
-function chainmapping_tftedopa(file::AbstractString)
-    p = open(file) do inp
-        s = read(inp, String)
-        p = JSON.parse(s)
+"""
+    chainmapping_tftedopa(file::IOStream)
+
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment described in the JSON file `file`, after transforming it into a
+`T=0` and `μ=0` environment through the TF-TEDOPA algorithm.
+
+See [`chainmapping_tedopa`](@ref) for more information.
+"""
+function chainmapping_tftedopa(file::IOStream)
+    s = read(file, String)
+    p = JSON.parse(s)
+    parameters = merge(p, Dict("filename" => file))
+    return chainmapping_tftedopa(parameters)
+end
+
+"""
+    chainmapping_tftedopa(filename::AbstractString)
+
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment described in the JSON file called `filename`, after transforming it into a
+`T=0` and `μ=0` environment through the TF-TEDOPA algorithm.
+
+See [`chainmapping_tedopa`](@ref) for more information.
+"""
+function chainmapping_tftedopa(filename::AbstractString)
+    return open(filename, "r") do inputfile
+        chainmapping_tftedopa(inputfile)
     end
-    sd_info = merge(p, Dict("filename" => file))
-    return chainmapping_tftedopa(sd_info)
 end
 
 """
     chainmapping_tftedopa(parameters::Dict{<:AbstractString, Any})
 
 Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment specified by the `envparameters` dictionary, after transforming it into a
+environment specified by the `parameters` dictionary, after transforming it into a
 `T=0` and `μ=0` environment through the TF-TEDOPA algorithm.
 
 See [`chainmapping_tedopa`](@ref) for more information.

@@ -11,10 +11,39 @@ function boson_thermal_factor(x, T)
 end
 
 """
+    chainmapping_ttedopa(file::IOStream)
+
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment described in the JSON file `file`, after a thermalization procedure.
+
+See [`chainmapping_tedopa`](@ref) for more information.
+"""
+function chainmapping_ttedopa(file::IOStream)
+    s = read(file, String)
+    p = JSON.parse(s)
+    parameters = merge(p, Dict("filename" => file))
+    return chainmapping_ttedopa(parameters)
+end
+
+"""
+    chainmapping_ttedopa(filename::AbstractString)
+
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment described in the JSON file called `filename`, after a thermalization procedure.
+
+See [`chainmapping_tedopa`](@ref) for more information.
+"""
+function chainmapping_ttedopa(filename::AbstractString)
+    return open(filename, "r") do inputfile
+        chainmapping_ttedopa(inputfile)
+    end
+end
+
+"""
     chainmapping_ttedopa(parameters::Dict{<:AbstractString, Any})
 
 Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment specified by the `envparameters` dictionary, after a thermalization procedure.
+environment specified by the `parameters` dictionary, after a thermalization procedure.
 
 See [`chainmapping_tedopa`](@ref) for more information.
 """
