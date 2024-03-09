@@ -13,7 +13,7 @@ julia> env = Dict(
 );
 julia> p = Dict(
     "environment" => env,
-    "number_of_oscillators" => 200,
+    "chain_length" => 200,
     "PolyChaos_nquad" => 5000,
 );
 julia> chainmapping_tedopa(p)
@@ -21,7 +21,7 @@ julia> chainmapping_tedopa(p)
 ```
 """
 function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
-    n_osc = parameters["number_of_oscillators"]
+    n_osc = parameters["chain_length"]
     environment = parameters["environment"]
 
     # The code which creates a function from a String is taken from

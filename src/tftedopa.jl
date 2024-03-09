@@ -53,10 +53,10 @@ environment specified by the `envparameters` dictionary, after transforming it i
 See [`chainmapping_tedopa`](@ref) for more information.
 """
 function chainmapping_tftedopa(parameters::Dict{<:AbstractString,Any})
-    chain_length = parameters["number_of_oscillators"]
+    chain_length = parameters["chain_length"]
     environment = parameters["environment"]
 
-    fn = parameters["spectral_density"]
+    fn = parameters["spectral_density_function"]
     tmp = eval(Meta.parse("(a, x) -> " * fn))
     sdf = x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)
 

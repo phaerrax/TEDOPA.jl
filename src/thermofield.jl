@@ -3,22 +3,35 @@ function chainmapping_thermofield(file::AbstractString)
         s = read(inp, String)
         return JSON.parse(s)
     end
-    sd_info = merge(p, Dict("filename" => file))
-    return chainmapping_thermofield(sd_info)
+    parameters = merge(p, Dict("filename" => file))
+    return chainmapping_thermofield(parameters)
 end
 
-function chainmapping_thermofield(sd_info::Dict{<:AbstractString,Any})
-    # Parse the spectral density function given in the info file.
-    sdfs = []
-    for d in sd_info["environments"]
-        tmp = eval(Meta.parse("(a, x) -> " * d["spectral_density"]))
-        push!(sdfs, x -> tmp(d["parameters"], x))
-    end
-    Ts = [d["temperature"] for d in sd_info["environments"]]
-    μs = [d["chemical_potential"] for d in sd_info["environments"]]
-    domains = [d["domain"] for d in sd_info["environments"]]
+function issingleton(domain)
+    return minimum(d) == maximum(d)
+end
 
-    chain_length = sd_info["number_of_oscillators"]
+"""
+    chainmapping_thermofield(parameters::Dict{<:AbstractString, Any})
+
+Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment specified by the `parameters` dictionary, after transforming it into a
+`T=0` and `μ=0` environment through the TF-TEDOPA algorithm.
+
+See [`chainmapping_tedopa`](@ref) for more information.
+"""
+function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
+    chain_length = parameters["chain_length"]
+    environments = parameters["environment"]
+
+    sdfs = []
+    for d in environments
+        tmp = eval(Meta.parse("(a, x) -> " * d["spectral_density_function"]))
+        push!(sdfs, x -> tmp(d["spectral_density_parameters"], x))
+    end
+    Ts = [d["temperature"] for d in environments]
+    μs = [d["chemical_potential"] for d in environments]
+    domains = [d["domain"] for d in environments]
 
     domains_empty = []
     domains_filled = []
@@ -53,54 +66,47 @@ function chainmapping_thermofield(sd_info::Dict{<:AbstractString,Any})
     merged_filled_domains = merge_domains(domains_filled)
     merged_empty_domains = merge_domains(domains_empty)
 
-    function issingleton(domain)
-        if !issorted(domain)
-            error("Input domain is not sorted. Cannot check if it is empty.")
-        end
-        return minimum(domain) == maximum(domain)
-    end
-
     # (We assume that the energies in the free environment Hamiltonians have already
     # been shifted with the chemical potentials. We won't do that here.)
 
     if !issingleton(merged_empty_domains) && !issingleton(merged_filled_domains)
-        (freqempty, coupempty, sysintempty) = chainmapcoefficients(
+        (freqempty, coupempty, sysintempty) = chainmapping(
             merged_sdfempty,
             merged_empty_domains,
             chain_length - 1;
-            Nquad=sd_info["PolyChaos_nquad"],
+            Nquad=parameters["PolyChaos_nquad"],
         )
-        (freqfilled, coupfilled, sysintfilled) = chainmapcoefficients(
+        (freqfilled, coupfilled, sysintfilled) = chainmapping(
             merged_sdffilled,
             merged_filled_domains,
             chain_length - 1;
-            Nquad=sd_info["PolyChaos_nquad"],
+            Nquad=parameters["PolyChaos_nquad"],
         )
 
         return (
-            coupempty=[sysintempty; coupempty],
-            coupfilled=[sysintfilled; coupfilled],
-            freqempty=freqempty,
-            freqfilled=freqfilled,
+            couplings_empty=[sysintempty; coupempty],
+            couplings_filled=[sysintfilled; coupfilled],
+            frequency_empty=freqempty,
+            frequency_filled=freqfilled,
         )
     elseif issingleton(merged_empty_domains)
-        (freqfilled, coupfilled, sysintfilled) = chainmapcoefficients(
+        (freqfilled, coupfilled, sysintfilled) = chainmapping(
             merged_sdffilled,
             merged_filled_domains,
             chain_length - 1;
-            Nquad=sd_info["PolyChaos_nquad"],
+            Nquad=parameters["PolyChaos_nquad"],
         )
 
-        return (coupfilled=[sysintfilled; coupfilled], freqfilled=freqfilled)
+        return (couplings_filled=[sysintfilled; coupfilled], frequency_filled=freqfilled)
     elseif issingleton(merged_filled_domains)
-        (freqempty, coupempty, sysintempty) = chainmapcoefficients(
+        (freqempty, coupempty, sysintempty) = chainmapping(
             merged_sdfempty,
             merged_empty_domains,
             chain_length - 1;
-            Nquad=sd_info["PolyChaos_nquad"],
+            Nquad=parameters["PolyChaos_nquad"],
         )
 
-        return (coupempty=[sysintempty; coupempty], freqempty=freqempty)
+        return (couplings_empty=[sysintempty; coupempty], frequency_empty=freqempty)
     else  # Both merged domains are singletons. There is no output.
         error("Both merged domains are empty. Please check the input spectral densities.")
     end

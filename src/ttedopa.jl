@@ -19,7 +19,7 @@ environment specified by the `envparameters` dictionary, after a thermalization 
 See [`chainmapping_tedopa`](@ref) for more information.
 """
 function chainmapping_ttedopa(parameters::Dict{<:AbstractString,Any})
-    n_osc = parameters["number_of_oscillators"]
+    n_osc = parameters["chain_length"]
     environment = parameters["environment"]
 
     fn = environment["spectral_density_function"]

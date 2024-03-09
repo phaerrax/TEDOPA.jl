@@ -26,13 +26,13 @@ encoded in a JSON dictionary with the following structure:
 ```json
 {
     "environment": {
-        "parameters": [1, 0.5],
-        "spectral_density": "1/(10pi) * sqrt((2a[2]-a[1]+x)*(2a[2]+a[1]-x))",
+        "spectral_density_parameters": [1, 0.5],
+        "spectral_density_function": "1/(10pi) * sqrt((2a[2]-a[1]+x)*(2a[2]+a[1]-x))",
         "domain": [0, 2],
         "temperature": 0.4,
         "chemical_potential": 0.5
     },
-    "number_of_oscillators": 200,
+    "chain_length": 200,
     "PolyChaos_nquad": 5000
 }
 ```
@@ -40,17 +40,17 @@ encoded in a JSON dictionary with the following structure:
 Each element of the `"environments"` subdictionary defines an environment as
 follows:
 
-* `"spectral_density"` is a string containing a valid Julia function of the
-  variable `x` and possibly a set of parameters `a[1]`, `a[2]`, etc.;
-* `"parameters"` is a list of numbers that will replace `a[1]`, `a[2]` and so
-  on in the spectral density function;
+* `"spectral_density_function"` is a string containing a valid Julia function
+  of the variable `x` and possibly a set of parameters `a[1]`, `a[2]`, etc.;
+* `"spectral_density_parameters"` is a list of numbers that will replace `a[1]`,
+  `a[2]` and so on in the spectral density function;
 * `"domain"` is the domain of the spectral density function;
 * `"temperature"` is the temperature of the environment;
 * `"chemical_potential"` is the chemical potential of the environment.
 
 There are then two additional parameters:
 
-* `"number_of_oscillators"` specifies the lengths of the resulting chains;
+* `"chain_length"` specifies the lengths of the resulting chains;
 * `"PolyChaos_nquad"` is a parameter for the numerical integration used to
   calculate the coefficients (usually a higher number means a higher precision).
 
@@ -64,8 +64,7 @@ from the original TEDOPA algorithm.
 * `chainmapping_tftedopa`: single-chain thermalized chain mapping for fermionic
   environments;
 * `chainmapping_thermofield`: a thermofield transformation and then a chain
-  mapping of the
-* `chainmapping_thermofield_merge`: like the previous point, but merging
+  mapping of the (fermionic) environment; it can also merge multiple
   multiple environments together (in this case, the `"environment"`
   subdictionary is replaced by a list of dictionaries, such as in the following
   example).
@@ -74,21 +73,21 @@ from the original TEDOPA algorithm.
 {
     "environment": [
         {
-            "parameters": [],
-            "spectral_density": "1/(pi*200)",
+            "spectral_density_parameters": [],
+            "spectral_density_function": "1/(pi*200)",
             "domain": [-100, 100],
             "temperature": 0,
             "chemical_potential": 0.01
         },
         {
-            "parameters": [],
-            "spectral_density": "1/(pi*200)",
+            "spectral_density_parameters": [],
+            "spectral_density_function": "1/(pi*200)",
             "domain": [-100, 100],
             "temperature": 0,
             "chemical_potential": -0.01
         }
     ],
-    "number_of_oscillators": 200,
+    "chain_length": 200,
     "PolyChaos_nquad": 5000
 }
 ```
