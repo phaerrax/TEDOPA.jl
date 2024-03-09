@@ -5,6 +5,6 @@
         "domain": [0, 10],
         "temperature": 0
     },
-    "number_of_oscillators": 50,
+    "chain_length": 50,
     "PolyChaos_nquad": 5000
 }
