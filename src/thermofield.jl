@@ -83,11 +83,9 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
             Nquad=parameters["PolyChaos_nquad"],
         )
 
-        return (
-            couplings_empty=[sysintempty; coupempty],
-            couplings_filled=[sysintfilled; coupfilled],
-            frequency_empty=freqempty,
-            frequency_filled=freqfilled,
+        chain_coefficients = Dict(
+            :empty => (couplings=[sysintempty; coupempty], frequencies=freqempty),
+            :filled => (couplings=[sysintfilled; coupfilled], frequencies=freqfilled),
         )
     elseif issingleton(merged_empty_domains)
         (freqfilled, coupfilled, sysintfilled) = chainmapping(
@@ -97,7 +95,11 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
             Nquad=parameters["PolyChaos_nquad"],
         )
 
-        return (couplings_filled=[sysintfilled; coupfilled], frequency_filled=freqfilled)
+        chain_coefficients = Dict(
+            :empty =>
+                (couplings=zero([sysintfilled; coupfilled]), frequencies=zero(freqfilled)),
+            :filled => (couplings=[sysintfilled; coupfilled], frequencies=freqfilled),
+        )
     elseif issingleton(merged_filled_domains)
         (freqempty, coupempty, sysintempty) = chainmapping(
             merged_sdfempty,
@@ -106,8 +108,13 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
             Nquad=parameters["PolyChaos_nquad"],
         )
 
-        return (couplings_empty=[sysintempty; coupempty], frequency_empty=freqempty)
+        chain_coefficients = Dict(
+            :empty => (couplings=[sysintempty; coupempty], frequencies=freqempty),
+            :filled =>
+                (couplings=zero([sysintempty; coupempty]), frequencies=zero(freqempty)),
+        )
     else  # Both merged domains are singletons. There is no output.
         error("Both merged domains are empty. Please check the input spectral densities.")
     end
+    return chain_coefficients
 end
