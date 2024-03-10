@@ -33,20 +33,22 @@ function chainmapping_thermofield(filename::AbstractString)
     end
 end
 
-function prep_environments(environment::Dict{<:AbstractString, Any})
+function prep_environments(environment::Dict{<:AbstractString,Any})
     tmp = eval(Meta.parse("(a, x) -> " * environment["spectral_density_function"]))
-    sdfs = [x -> tmp(environment["spectral_density_parameters"], x)]
+    sdfs = [x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)]
     Ts = [environment["temperature"]]
     μs = [environment["chemical_potential"]]
     domains = [environment["domain"]]
     return sdfs, Ts, μs, domains
 end
 
-function prep_environments(environments::Vector{Dict{<:AbstractString, Any}})
+function prep_environments(environments::Vector{Dict{<:AbstractString,Any}})
     sdfs = []
     for d in environments
         tmp = eval(Meta.parse("(a, x) -> " * d["spectral_density_function"]))
-        push!(sdfs, x -> tmp(d["spectral_density_parameters"], x))
+        push!(
+            sdfs, x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)
+        )
     end
     Ts = [d["temperature"] for d in environments]
     μs = [d["chemical_potential"] for d in environments]
