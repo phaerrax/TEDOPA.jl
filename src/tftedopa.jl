@@ -16,7 +16,8 @@ function tftedopa_sdf_transform(J::Function, domain, T, μ)
         newJ =
             ω -> (
                 if ω >= 0
-                    (indicator(ω, domain_neg) * J(μ - ω) + indicator(x, domain_pos) * J(μ + ω))
+                    (iszero(indicator(ω, domain_neg)) ? zero(ω) : J(μ - ω)) +
+                    (iszero(indicator(ω, domain_pos)) ? zero(ω) : J(μ + ω))
                 else
                     0
                 end
@@ -26,12 +27,12 @@ function tftedopa_sdf_transform(J::Function, domain, T, μ)
         newJ =
             ω -> (
                 0.5(1 + tanh(0.5ω / T)) * (
-                    indicator(ω, domain_neg) * J(μ - ω) +
-                    indicator(x, domain_pos) * J(μ + ω)
+                    (iszero(indicator(ω, domain_neg)) ? zero(ω) : J(μ - ω)) +
+                    (iszero(indicator(ω, domain_pos)) ? zero(ω) : J(μ + ω))
                 )
             )
     end
-    return (newdomain, newJ)
+    return (newJ, newdomain)
 end
 
 """
