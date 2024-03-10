@@ -1,5 +1,5 @@
 function issingleton(domain)
-    return minimum(d) == maximum(d)
+    return minimum(domain) == maximum(domain)
 end
 
 """
