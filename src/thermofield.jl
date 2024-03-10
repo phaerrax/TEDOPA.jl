@@ -33,6 +33,27 @@ function chainmapping_thermofield(filename::AbstractString)
     end
 end
 
+function prep_environments(environment::Dict{<:AbstractString, Any})
+    tmp = eval(Meta.parse("(a, x) -> " * environment["spectral_density_function"]))
+    sdfs = [x -> tmp(environment["spectral_density_parameters"], x)]
+    Ts = [environment["temperature"]]
+    μs = [environment["chemical_potential"]]
+    domains = [environment["domain"]]
+    return sdfs, Ts, μs, domains
+end
+
+function prep_environments(environments::Vector{Dict{<:AbstractString, Any}})
+    sdfs = []
+    for d in environments
+        tmp = eval(Meta.parse("(a, x) -> " * d["spectral_density_function"]))
+        push!(sdfs, x -> tmp(d["spectral_density_parameters"], x))
+    end
+    Ts = [d["temperature"] for d in environments]
+    μs = [d["chemical_potential"] for d in environments]
+    domains = [d["domain"] for d in environments]
+    return sdfs, Ts, μs, domains
+end
+
 """
     chainmapping_thermofield(parameters::Dict{<:AbstractString, Any})
 
@@ -44,16 +65,10 @@ See [`chainmapping_tedopa`](@ref) for more information.
 """
 function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
     chain_length = parameters["chain_length"]
-    environments = parameters["environment"]
 
-    sdfs = []
-    for d in environments
-        tmp = eval(Meta.parse("(a, x) -> " * d["spectral_density_function"]))
-        push!(sdfs, x -> tmp(d["spectral_density_parameters"], x))
-    end
-    Ts = [d["temperature"] for d in environments]
-    μs = [d["chemical_potential"] for d in environments]
-    domains = [d["domain"] for d in environments]
+    # Is parameters["environment"] a Dict{String, Any} or a Vector{Dict{String, Any}}?
+    # How do we check it? We don't! We let Julia do it by passing it to a function.
+    sdfs, Ts, μs, domains = prep_environments(parameters["environment"])
 
     domains_empty = []
     domains_filled = []
