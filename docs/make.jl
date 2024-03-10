@@ -11,4 +11,5 @@ makedocs(;
     format=Documenter.HTML(; edit_link="github"),
     pages=["Home" => "index.md"],
     checkdocs=:none,
+    deploydocs(; repo="github.com/phaerrax/TEDOPA.jl.git"),
 )
