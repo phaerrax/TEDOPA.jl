@@ -42,13 +42,11 @@ function prep_environments(environment::Dict{<:AbstractString,Any})
     return sdfs, Ts, μs, domains
 end
 
-function prep_environments(environments::Vector{Dict{<:AbstractString,Any}})
+function prep_environments(environments::Vector{Any})
     sdfs = []
     for d in environments
         tmp = eval(Meta.parse("(a, x) -> " * d["spectral_density_function"]))
-        push!(
-            sdfs, x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)
-        )
+        push!(sdfs, x -> Base.invokelatest(tmp, d["spectral_density_parameters"], x))
     end
     Ts = [d["temperature"] for d in environments]
     μs = [d["chemical_potential"] for d in environments]

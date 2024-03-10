@@ -79,7 +79,7 @@ function chainmapping_tftedopa(parameters::Dict{<:AbstractString,Any})
     chain_length = parameters["chain_length"]
     environment = parameters["environment"]
 
-    fn = parameters["spectral_density_function"]
+    fn = environment["spectral_density_function"]
     tmp = eval(Meta.parse("(a, x) -> " * fn))
     sdf = x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)
 
