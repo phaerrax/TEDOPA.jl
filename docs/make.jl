@@ -10,7 +10,7 @@ makedocs(;
     repo=Remotes.GitHub("phaerrax", "TEDOPA.jl"),
     format=Documenter.HTML(; edit_link="github"),
     pages=["Home" => "index.md"],
-    checkdocs=:none,
+    checkdocs=:exported,
 )
 
 deploydocs(;

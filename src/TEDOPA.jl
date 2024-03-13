@@ -3,9 +3,6 @@ module TEDOPA
 using Measures
 using PolyChaos
 using QuadGK
-using DataFrames
-using CSV
-using DelimitedFiles
 using JSON
 
 export chainmapping, chainmapping_tedopa
