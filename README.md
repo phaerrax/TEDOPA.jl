@@ -11,11 +11,32 @@ T-TEDOPA or the thermofield transformation.
 
 ## Installation
 
-The package must be installed directly from GitHub, as it is not in any public
-registry. From the Julia REPL, type `]` to enter the Pkg REPL mode and run:
+### From a registry
+
+This package is registered in my
+[TensorNetworkSimulations](https://github.com/phaerrax/TensorNetworkSimulations)
+registry. By first adding this registry, with
 
 ```julia
-add "https://github.com/phaerrax/TEDOPA.jl.git"
+using Pkg
+pkg"registry add https://github.com/phaerrax/TensorNetworkSimulations.git"
+```
+
+(this must be done just once per Julia installation) the package can then be
+installed as a normal one:
+
+```julia
+using Pkg
+Pkg.add("TEDOPA")
+```
+
+### From GitHub
+
+Alternatively, straight installation from GitHub is also possible:
+
+```julia
+using Pkg
+Pkg.add("https://github.com/phaerrax/TEDOPA.jl")
 ```
 
 ## Environments description
