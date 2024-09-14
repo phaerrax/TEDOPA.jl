@@ -91,10 +91,16 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
     n(β, μ, ω) = (exp(β * (ω - μ)) + 1)^(-1)
 
     function merged_sdfempty(ω)
-        return sum([(1 - n(1 / T, μ, ω)) * f(ω) for (f, T, μ) in zip(sdfs, Ts, μs)])
+        return sum([
+            minimum(dom) < ω < maximum(dom) ? (1 - n(1 / T, μ, ω)) * f(ω) : zero(ω) for
+            (f, T, μ, dom) in zip(sdfs, Ts, μs, domains_empty)
+        ])
     end
     function merged_sdffilled(ω)
-        return sum([n(1 / T, μ, ω) * f(ω) for (f, T, μ) in zip(sdfs, Ts, μs)])
+        return sum([
+            minimum(dom) < ω < maximum(dom) ? n(1 / T, μ, ω) * f(ω) : zero(ω) for
+            (f, T, μ, dom) in zip(sdfs, Ts, μs, domains_filled)
+        ])
     end
 
     # To merge the domains: concatenate, sort, then remove duplicates
