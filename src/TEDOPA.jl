@@ -7,7 +7,7 @@ using JSON
 
 export chainmapping, chainmapping_tedopa
 
-include("tedopa.jl")
+include("tedopa_base.jl")
 
 export chainmapping_ttedopa
 
