@@ -131,8 +131,18 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
         )
 
         chain_coefficients = Dict(
-            :empty => (couplings=[sysintempty; coupempty], frequencies=freqempty),
-            :filled => (couplings=[sysintfilled; coupfilled], frequencies=freqfilled),
+            :empty => ChainMappedEnvironment(
+                merged_empty_domains,
+                merged_sdfempty,
+                freqempty,
+                [sysintempty; coupempty],
+            ),
+            :filled => ChainMappedEnvironment(
+                merged_filled_domains,
+                merged_sdffilled,
+                freqfilled,
+                [sysintfilled; coupfilled],
+            ),
         )
     elseif issingleton(merged_empty_domains)
         (freqfilled, coupfilled, sysintfilled) = chainmapping(
@@ -143,9 +153,18 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
         )
 
         chain_coefficients = Dict(
-            :empty =>
-                (couplings=zero([sysintfilled; coupfilled]), frequencies=zero(freqfilled)),
-            :filled => (couplings=[sysintfilled; coupfilled], frequencies=freqfilled),
+            :empty => ChainMappedEnvironment(
+                merged_empty_domains,
+                zero,
+                zero(freqfilled),
+                zero([sysintfilled; coupfilled]),
+            ),
+            :filled => ChainMappedEnvironment(
+                merged_filled_domains,
+                merged_sdffilled,
+                freqfilled,
+                [sysintfilled; coupfilled],
+            ),
         )
     elseif issingleton(merged_filled_domains)
         (freqempty, coupempty, sysintempty) = chainmapping(
@@ -156,9 +175,18 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
         )
 
         chain_coefficients = Dict(
-            :empty => (couplings=[sysintempty; coupempty], frequencies=freqempty),
-            :filled =>
-                (couplings=zero([sysintempty; coupempty]), frequencies=zero(freqempty)),
+            :empty => ChainMappedEnvironment(
+                merged_empty_domains,
+                merged_sdfempty,
+                freqempty,
+                [sysintempty; coupempty],
+            ),
+            :filled => ChainMappedEnvironment(
+                merged_filled_domains,
+                zero,
+                zero(freqempty),
+                zero([sysintempty; coupempty]),
+            ),
         )
     else  # Both merged domains are singletons. There is no output.
         error("Both merged domains are empty. Please check the input spectral densities.")

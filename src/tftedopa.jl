@@ -92,18 +92,22 @@ function chainmapping_tftedopa(parameters::Dict{<:AbstractString,Any})
     if μ < first(domain) || μ > last(domain)
         throw(
             DomainError(
-                "the spectral function: the chemical potential must lie inside the domain"
+                "the spectral function", "the chemical potential must lie inside the domain"
             ),
         )
     end
 
-    cm_freqs, cm_coups, cm_syscoup = if T == 0 && μ == 0
+    return if T == 0 && μ == 0
         # Normal TEDOPA: it's simpler.
-        chainmapping(sdf, domain, chain_length - 1; Nquad=parameters["PolyChaos_nquad"])
+        cm_freqs, cm_coups, cm_syscoup = chainmapping(
+            sdf, domain, chain_length - 1; Nquad=parameters["PolyChaos_nquad"]
+        )
+        ChainMappedEnvironment(domain, sdf, cm_freqs, [cm_syscoup; cm_coups])
     else
         newJ, newdomain = tftedopa_sdf_transform(sdf, domain, T, μ)
-        chainmapping(newJ, newdomain, chain_length - 1; Nquad=parameters["PolyChaos_nquad"])
+        cm_freqs, cm_coups, cm_syscoup = chainmapping(
+            newJ, newdomain, chain_length - 1; Nquad=parameters["PolyChaos_nquad"]
+        )
+        ChainMappedEnvironment(newdomain, newJ, cm_freqs, [cm_syscoup; cm_coups])
     end
-
-    return (frequencies=cm_freqs, couplings=[cm_syscoup; cm_coups])
 end

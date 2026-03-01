@@ -81,5 +81,5 @@ function chainmapping_ttedopa(parameters::Dict{<:AbstractString,Any})
         Nquad=parameters["PolyChaos_nquad"],
         discretization=lanczos,
     )
-    return (frequencies=cm_freqs, couplings=[cm_syscoup; cm_coups])
+    return ChainMappedEnvironment(therm_domain, therm_sdf, cm_freqs, [cm_syscoup; cm_coups])
 end

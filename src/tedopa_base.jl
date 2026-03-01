@@ -1,3 +1,28 @@
+struct ChainMappedEnvironment{F<:Function}
+    domain::Vector{Float64}
+    spectral_density_function::F
+    frequencies::Vector{Float64}
+    couplings::Vector{Float64}
+end
+
+frequencies(ce::ChainMappedEnvironment) = ce.frequencies
+couplings(ce::ChainMappedEnvironment) = ce.couplings
+domain(ce::ChainMappedEnvironment) = ce.domain
+function (ce::ChainMappedEnvironment)(x)
+    if first(domain(ce)) ≤ x ≤ last(domain(ce))
+        return ce.spectral_density_function(x)
+    else
+        errmsg = string(
+            "The spectral density function is not defined for x ∉ [",
+            first(domain(ce)),
+            ", ",
+            last(domain(ce)),
+            "].",
+        )
+        throw(DomainError(x, errmsg))
+    end
+end
+
 """
     chainmapping_tedopa(file::IOStream)
 
@@ -69,7 +94,9 @@ function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
         Nquad=parameters["PolyChaos_nquad"],
         discretization=lanczos,
     )
-    return (frequencies=cm_freqs, couplings=[cm_syscoup; cm_coups])
+    return ChainMappedEnvironment(
+        sort(environment["domain"]), sdf, cm_freqs, [cm_syscoup; cm_coups]
+    )
 end
 
 """
