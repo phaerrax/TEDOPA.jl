@@ -105,7 +105,11 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
 
     # To merge the domains: concatenate, sort, then remove duplicates
     # TODO: check if there are gaps in the resulting merged domains.
-    merge_domains(domains) = unique(sort(vcat(domains...)))
+    merge_domains(domains) = unique(correct_minus_00, sort(vcat(domains...)))
+    # We need to call `unique` with `correct_minus_00` because otherwise
+    # `isequal(-0.0, 0.0)` is false, and so `unique([-0.0, 0.0]) == [-0.0, 0.0]. This leads
+    # to integration errors with quadgk if the spectral density diverges in zero.
+
     merged_filled_domains = merge_domains(domains_filled)
     merged_empty_domains = merge_domains(domains_empty)
 

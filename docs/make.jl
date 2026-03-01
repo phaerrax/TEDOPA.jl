@@ -13,8 +13,4 @@ makedocs(;
     checkdocs=:exported,
 )
 
-deploydocs(;
-    devbranch="main",
-    branch="gh-pages",
-    repo="github.com/phaerrax/TEDOPA.jl.git",
-)
+deploydocs(; devbranch="main", branch="gh-pages", repo="github.com/phaerrax/TEDOPA.jl.git")

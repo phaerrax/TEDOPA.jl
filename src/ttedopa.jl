@@ -64,9 +64,14 @@ function chainmapping_ttedopa(parameters::Dict{<:AbstractString,Any})
         )
     end
     T = environment["temperature"]
+
+    therm_domain = unique(correct_minus_00, [reverse(-domain); domain])
     # Reverse the domain around zero and remove duplicates: for example
     #   [0, 2, 5]  -->  [-5, -2, 0, 0, 2, 5]  -->  [-5, -2, 0, 2, 5].
-    therm_domain = unique([reverse(-domain); domain])
+    # We need to call `unique` with `correct_minus_00` because otherwise
+    # `isequal(-0.0, 0.0)` is false, and so `unique([-0.0, 0.0]) == [-0.0, 0.0]. This leads
+    # to integration errors with quadgk if the spectral density diverges in zero.
+
     therm_sdf(x) = boson_thermal_factor(x, T) * sign(x) * sdf(abs(x))
 
     cm_freqs, cm_coups, cm_syscoup = chainmapping(

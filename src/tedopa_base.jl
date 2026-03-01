@@ -130,3 +130,7 @@ function chainmapping(J::Function, support, L::Int; kwargs...)
     η = sqrt(quadgk(J, support...)[begin])
     return Ω, κ, η
 end
+
+@inline correct_minus_00(x) = (x==0.0 ? zero(x) : x)
+# Small helper function that treats -0.0 and 0.0 as equal. Useful when you do not want
+# to discriminate between the two numbers, i.e. when using `unique`.
