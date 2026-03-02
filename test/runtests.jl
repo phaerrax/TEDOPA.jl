@@ -36,7 +36,7 @@ using TEDOPA, QuadGK
     ] rtol=rtol
 end
 
-@testset "T-TEDOPA" begin
+@testset "Convergence of T-TEDOPA coefficients" begin
     atol = 2e-3
     x0 = 2
     xmax = 10*x0
@@ -59,4 +59,47 @@ end
 
     @test abs(last(frequencies(env))) < atol
     @test last(couplings(env)) ≈ xmax / 2 atol=atol
+end
+
+@testset "Thermofield with semi-elliptical densities" begin
+    rtol = 1e-6
+    a = 1 / 2pi
+    semielliptic_sdf = "a[1] * sqrt( x * (2-x) )"
+    chainlength = 1_000
+
+    dict_0 = Dict(
+        "environment" => Dict(
+            "spectral_density_parameters" => [a],
+            "spectral_density_function" => semielliptic_sdf,
+            "domain" => [0.0, 2.0],
+        ),
+        "chain_length" => chainlength,
+        "PolyChaos_nquad" => 2*chainlength,
+    )
+
+    envs_0 = chainmapping_tedopa(dict_0)
+
+    @test frequencies(envs_0) ≈ ones(chainlength) rtol=rtol
+    @test couplings(envs_0) ≈ fill(0.5, chainlength) rtol=rtol
+
+    dict_inf = Dict(
+        "environment" => Dict(
+            "spectral_density_parameters" => [a],
+            "spectral_density_function" => semielliptic_sdf,
+            "domain" => [0.0, 2.0],
+            "temperature" => +Inf,
+            "chemical_potential" => 1,
+        ),
+        "chain_length" => chainlength,
+        "PolyChaos_nquad" => 2*chainlength,
+    )
+
+    envs_inf = chainmapping_thermofield(dict_inf)
+
+    @test frequencies(envs_inf[:filled]) ≈ frequencies(envs_0) rtol=rtol
+    @test couplings(envs_inf[:filled]) ≈
+        [1/sqrt(2); ones(chainlength-1)] .* couplings(envs_0) rtol=rtol
+    @test frequencies(envs_inf[:empty]) ≈ frequencies(envs_0) rtol=rtol
+    @test couplings(envs_inf[:empty]) ≈
+        [1/sqrt(2); ones(chainlength-1)] .* couplings(envs_0) rtol=rtol
 end
