@@ -38,7 +38,7 @@ function prep_environments(environment::Dict{<:AbstractString,Any})
     sdfs = [x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)]
     Ts = [environment["temperature"]]
     μs = [environment["chemical_potential"]]
-    domains = [environment["domain"]]
+    domains = [float(sort(environment["domain"]))]
     return sdfs, Ts, μs, domains
 end
 
@@ -50,7 +50,7 @@ function prep_environments(environments::Vector{Any})
     end
     Ts = [d["temperature"] for d in environments]
     μs = [d["chemical_potential"] for d in environments]
-    domains = [d["domain"] for d in environments]
+    domains = [float(sort(d["domain"])) for d in environments]
     return sdfs, Ts, μs, domains
 end
 

@@ -80,6 +80,7 @@ julia> chainmapping_tedopa(p)
 function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
     n_osc = parameters["chain_length"]
     environment = parameters["environment"]
+    domain = float(sort(environment["domain"]))
 
     # The code which creates a function from a String is taken from
     # https://stackoverflow.com/a/53134127/4160978 
@@ -89,14 +90,12 @@ function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
 
     cm_freqs, cm_coups, cm_syscoup = chainmapping(
         sdf,
-        sort(environment["domain"]),
+        domain,
         n_osc - 1;
         Nquad=parameters["PolyChaos_nquad"],
         discretization=lanczos,
     )
-    return ChainMappedEnvironment(
-        sort(environment["domain"]), sdf, cm_freqs, [cm_syscoup; cm_coups]
-    )
+    return ChainMappedEnvironment(domain, sdf, cm_freqs, [cm_syscoup; cm_coups])
 end
 
 """

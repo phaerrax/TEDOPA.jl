@@ -83,7 +83,7 @@ function chainmapping_tftedopa(parameters::Dict{<:AbstractString,Any})
     tmp = eval(Meta.parse("(a, x) -> " * fn))
     sdf = x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)
 
-    domain = environment["domain"]
+    domain = float(sort(environment["domain"]))
     T = environment["temperature"]
     μ = environment["chemical_potential"]
     # If [a,b] is the support of the original spectral density, the transformed one will

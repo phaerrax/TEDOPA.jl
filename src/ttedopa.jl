@@ -55,8 +55,8 @@ function chainmapping_ttedopa(parameters::Dict{<:AbstractString,Any})
     tmp = eval(Meta.parse("(a, x) -> " * fn))
     sdf = x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)
 
-    domain = environment["domain"]
-    if first(domain) != 0
+    domain = float(sort(environment["domain"]))
+    if !iszero(first(domain))
         throw(
             DomainError(
                 "the spectral function: its support must be of the form [0, m] with m>0"
