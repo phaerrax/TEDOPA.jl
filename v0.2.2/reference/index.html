@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Reference · TEDOPA.jl</title><meta name="title" content="Reference · TEDOPA.jl"/><meta property="og:title" content="Reference · TEDOPA.jl"/><meta property="twitter:title" content="Reference · TEDOPA.jl"/><meta name="description" content="Documentation for TEDOPA.jl."/><meta property="og:description" content="Documentation for TEDOPA.jl."/><meta property="twitter:description" content="Documentation for TEDOPA.jl."/><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.050/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.16.8/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../search_index.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-mocha.css" data-theme-name="catppuccin-mocha"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-macchiato.css" data-theme-name="catppuccin-macchiato"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-frappe.css" data-theme-name="catppuccin-frappe"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/catppuccin-latte.css" data-theme-name="catppuccin-latte"/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><div class="docs-package-name"><span class="docs-autofit"><a href="../">TEDOPA.jl</a></span></div><button class="docs-search-query input is-rounded is-small is-clickable my-2 mx-auto py-1 px-2" id="documenter-search-query">Search docs (Ctrl + /)</button><ul class="docs-menu"><li><a class="tocitem" href="../">Overview</a></li><li class="is-active"><a class="tocitem" href>Reference</a><ul class="internal"><li><a class="tocitem" href="#How-to-describe-environments"><span>How to describe environments</span></a></li><li><a class="tocitem" href="#Chain-mapping-functions"><span>Chain-mapping functions</span></a></li><li><a class="tocitem" href="#Standard-TEDOPA-chain-mapping"><span>Standard TEDOPA chain mapping</span></a></li><li><a class="tocitem" href="#Thermalised-TEDOPA"><span>Thermalised TEDOPA</span></a></li><li><a class="tocitem" href="#ThermofieldTEDOPA-(for-fermionic-environments)"><span>Thermofield+TEDOPA (for fermionic environments)</span></a></li></ul></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><a class="docs-sidebar-button docs-navbar-link fa-solid fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>Reference</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>Reference</a></li></ul></nav><div class="docs-right"><a class="docs-navbar-link" href="https://github.com/phaerrax/TEDOPA.jl" title="View the repository on GitHub"><span class="docs-icon fa-brands"></span><span class="docs-label is-hidden-touch">GitHub</span></a><a class="docs-navbar-link" href="https://github.com/phaerrax/TEDOPA.jl/blob/main/docs/src/reference.md" title="Edit source on GitHub"><span class="docs-icon fa-solid"></span></a><a class="docs-settings-button docs-navbar-link fa-solid fa-gear" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-article-toggle-button fa-solid fa-chevron-up" id="documenter-article-toggle-button" href="javascript:;" title="Collapse all docstrings"></a></div></header><article class="content" id="documenter-page"><h1 id="Reference"><a class="docs-heading-anchor" href="#Reference">Reference</a><a id="Reference-1"></a><a class="docs-heading-anchor-permalink" href="#Reference" title="Permalink"></a></h1><h2 id="How-to-describe-environments"><a class="docs-heading-anchor" href="#How-to-describe-environments">How to describe environments</a><a id="How-to-describe-environments-1"></a><a class="docs-heading-anchor-permalink" href="#How-to-describe-environments" title="Permalink"></a></h2><p>Each variant of TEDOPA starts from the description of an environment: in this package, information about an environment must be encoded in a dictionary with the following structure: here is a breakdown of all the required keys.</p><p>The <code>&quot;environment&quot;</code> key collects the information about the environment, and contains the following sub-keys.</p><ul><li><code>&quot;spectral_density_function&quot;</code> is a string containing a valid Julia function of the variable <code>x</code>, and possibly a set of additional parameters that must be named <code>a[1]</code>, <code>a[2]</code>, and so on.</li><li><code>&quot;spectral_density_parameters&quot;</code> is a list of numbers that will replace <code>a[1]</code>, <code>a[2]</code> etc., in the given order, in the spectral density function. If no additional parameters are needed in the spectral density function, assign the empty list <code>[]</code> to this key.</li><li><code>&quot;domain&quot;</code> is the support of the spectral density function. For the purposes of this package, this is always an interval of the real line, than can be given as a list of two real numbers, representing the endpoints of the interval. If the spectral density function contains singular points, it is strongly advised to add those points to the domain (following the proper numerical order). These intermediate points will be taken into account by the numerical integration routines, leading to more precise results.  For example, for a spectral density function defined on <span>$[0,1]$</span> with singular points in <span>$1/4$</span> and <span>$1/2$</span> we should set the <code>domain</code> key to <code>[0,0.25,0.5,1]</code>.</li><li><code>&quot;temperature&quot;</code> is the temperature of the environment.</li><li><code>&quot;chemical_potential&quot;</code> is the chemical potential of the environment, which is a number that must lie within the domain of the spectral density function.</li></ul><p>The last two items can be omitted if the algorithm doesn&#39;t need them.</p><p>There are then two additional parameters, which are not related to the original environments.</p><ul><li><code>&quot;chain_length&quot;</code> specifies the lengths of the resulting chains, i.e. how many sites they will have.</li><li><code>&quot;PolyChaos_nquad&quot;</code>, an integer, is a parameter that will be passed to the numerical integration routines used to calculate the coefficients (usually a higher number results in a higher precision).</li></ul><h3 id="Examples"><a class="docs-heading-anchor" href="#Examples">Examples</a><a id="Examples-1"></a><a class="docs-heading-anchor-permalink" href="#Examples" title="Permalink"></a></h3><p>The following dictionary describes a (simplified) super-Ohmic spectral density on <span>$[0,2]$</span> with a hard cutoff: <span>$J(x) = x^2$</span>. This can be encoded in a dictionary in the aforementioned format as follows:</p><pre><code class="language-julia hljs">Dict(                                 
+    &quot;environment&quot; =&gt; Dict(
+        &quot;spectral_density_parameters&quot; =&gt; [],
+        &quot;spectral_density_function&quot; =&gt; &quot;x^2&quot;,
+        &quot;domain&quot; =&gt; [0, 2],    
+    ),
+    &quot;chain_length&quot; =&gt; 100,
+    &quot;PolyChaos_nquad&quot; =&gt; 200,
+)</code></pre><p>This other dictionary describes an environment with a semi-elliptical spectral density</p><p class="math-container">\[J(x) = \frac{1}{2\pi} \sqrt{x(2-x)}\]</p><p>on the domain <span>$[0,2]$</span>, and given temperature and chemical potential:</p><pre><code class="language-julia hljs">Dict(
+    &quot;environment&quot; =&gt; {
+        &quot;spectral_density_parameters&quot; =&gt; [1, 0.5],
+        &quot;spectral_density_function&quot; =&gt; &quot;1/2pi * sqrt((2a[2]-a[1]+x)*(2a[2]+a[1]-x))&quot;,
+        &quot;domain&quot; =&gt; [0, 2],
+        &quot;temperature&quot; =&gt; 0.4,
+        &quot;chemical_potential&quot; =&gt; 0.5
+    },
+    &quot;chain_length&quot; =&gt; 200,
+    &quot;PolyChaos_nquad&quot; =&gt; 5000,
+)</code></pre><p>Note that the use of spectral function parameters is not mandatory, and is purely for convenience.</p><h2 id="Chain-mapping-functions"><a class="docs-heading-anchor" href="#Chain-mapping-functions">Chain-mapping functions</a><a id="Chain-mapping-functions-1"></a><a class="docs-heading-anchor-permalink" href="#Chain-mapping-functions" title="Permalink"></a></h2><p>This package offers several ways of computing the chain mapping, all derived from the original TEDOPA algorithm.</p><ul><li><code>chainmapping_tedopa</code>: standard chain mapping of a single environment;</li><li><code>chainmapping_ttedopa</code>: single-chain thermalised chain mapping for bosonic environments;</li><li><code>chainmapping_tftedopa</code>: single-chain thermalised chain mapping for fermionic environments;</li><li><code>chainmapping_thermofield</code>: a thermofield transformation and then a chain mapping of the resulting (fermionic) environment; it can also merge multiple multiple environments together (in this case, the <code>&quot;environment&quot;</code> subdictionary is replaced by a list of dictionaries, as illustrated in the example below).</li></ul><p>The dictionary can be directly supplied as an argument, directly as a Julia <code>Dict</code> object (more precisely of the <code>Dict{&lt;:AbstractString,Any}</code> type) to these functions. Alternatively, the dictionary can be stored in a file, in JSON format; then you can supply to these functions either a string containing the file name, or the file stream object directly.</p><h3 id="Example"><a class="docs-heading-anchor" href="#Example">Example</a><a id="Example-1"></a><a class="docs-heading-anchor-permalink" href="#Example" title="Permalink"></a></h3><p>Given a Julia dictionary <code>dict</code> such as the two ones in the <a href="#How-to-describe-environments">How to describe environments</a>, we can call one of the four methods above with <code>dict</code> as an argument, for example <code>chainmapping_ttedopa(dict)</code>. Say we want, instead, to store the information in a JSON file called <code>ohmic.json</code>, with the following contents:</p><pre><code class="language-json hljs">{
+    &quot;environment&quot;: {
+        &quot;spectral_density_parameters&quot;: [1, 0.5],
+        &quot;spectral_density_function&quot;: &quot;1/2pi * sqrt((2a[2]-a[1]+x)*(2a[2]+a[1]-x))&quot;,
+        &quot;domain&quot;: [0, 2],
+        &quot;temperature&quot;: 0.4,
+        &quot;chemical_potential&quot;: 0.5
+    },
+    &quot;chain_length&quot;: 200,
+    &quot;PolyChaos_nquad&quot;: 5000
+}</code></pre><p>We can then directly call <code>chainmapping_ttedopa(&quot;ohmic.json&quot;)</code>, or first open the file in Julia and then pass the stream object to the chain-mapping function:</p><pre><code class="language-julia hljs">open(&quot;ohmic.json&quot;, &quot;r&quot;) do f
+    chainmapping_ttedopa(f)
+end</code></pre><h3 id="Core-algorithm"><a class="docs-heading-anchor" href="#Core-algorithm">Core algorithm</a><a id="Core-algorithm-1"></a><a class="docs-heading-anchor-permalink" href="#Core-algorithm" title="Permalink"></a></h3><p>This is the chain-mapping algorithm, detailed in [<a href="../#Chin2010">2</a>], that lies at the core of the package.</p><p>Let <span>$f \colon X \to [0, +\infty)$</span> be a measurable function, and <span>$\{p_n\}_{n=0}^{+\infty}$</span> be the set of monic orthogonal polynomials with respect to the measure <span>$\dd f(x) = f(x)\,\dd x$</span>. They satisfy</p><p class="math-container">\[x p_n(x) = p_{n+1}(x) + \alpha_n p_n(x) + \beta_n p_{n-1}(x)\]</p><p>for all <span>$n \in \N$</span>, with <span>$p_{-1} \equiv 0$</span>.</p><p>The (internal) <code>chainmapping</code> method, given the function <span>$f$</span>, returns the sequences of the <em>recurrence coefficients</em> <span>$\alpha_n$</span> and <span>$\beta_n$</span>. Remember that, for the purposes of this package, we always assume that the support of <span>$f$</span> is an interval on the real line.</p><h2 id="Standard-TEDOPA-chain-mapping"><a class="docs-heading-anchor" href="#Standard-TEDOPA-chain-mapping">Standard TEDOPA chain mapping</a><a id="Standard-TEDOPA-chain-mapping-1"></a><a class="docs-heading-anchor-permalink" href="#Standard-TEDOPA-chain-mapping" title="Permalink"></a></h2><p>The chain-mapping algorithm is used by TEDOPA in order to transform the original continuous environment into a discrete chain of modes. Consider an environment described by the free Hamiltonian</p><p class="math-container">\[H\env = \int_X x \adj{f_x} f_x \,\dd x\]</p><p>where <span>$f_x$</span> and <span>$\adj f_x$</span> are the annihilation and creation operators, respectively, of the environment mode at frequency/energy <span>$x$</span>, and, for example, the interaction Hamiltonian</p><p class="math-container">\[H\inter = \int_X (\adj{A\sys} f_x + \adj{f_x} A\sys) \sqrt{J(x)} \,\dd x\]</p><p>although other interaction forms can be used, as long as the operator is linear in <span>$f_x$</span> and <span>$\adj f_x$</span>.  Then, the unitary transformation</p><p class="math-container">\[b_n = \int_X \conj{u_n(x)} f_x \,\dd x, \qquad u_n(x) = \sqrt{J(x)}
+\frac{p_n(x)}{\norm{p_n}}\]</p><p>generates a new set of canonical operators <span>$b_n$</span> that satisfy the same statistics (bosonic or fermionic) as the original <span>$f_x$</span> operators. In terms of the new mode operators,</p><p class="math-container">\[H\env = \sum_{n=0}^{+\infty} \bigl[\omega_n \adj{b_n} b_n + \kappa_n (\adj{b_n}
+b_{n+1} + \adj{b_{n+1}} b_n) \bigr],\]</p><p>and</p><p class="math-container">\[H\inter = \eta (\adj{A\sys} b_0 + \adj{b_0} A\sys)\]</p><p>where <span>$\omega_n = \alpha_n$</span>, <span>$\kappa_n = \sqrt{\beta_{n+1}}$</span> for <span>$n \in \N$</span> and <span>$\eta = \norm{p_0}$</span>, where the monic orthogonal polynomials and the recurrence coefficients are taken with respect to the measure induced by <span>$J$</span>. The <code>chainmapping_tedopa</code> method takes the spectral density function <span>$J$</span> and computes the <em>frequencies</em> <span>$\omega_n$</span>, the <em>couplings</em> <span>$\kappa_n$</span> and the system-environment coupling <span>$\eta$</span>.</p><article><details class="docstring" open="true"><summary id="TEDOPA.chainmapping_tedopa"><a class="docstring-binding" href="#TEDOPA.chainmapping_tedopa"><code>TEDOPA.chainmapping_tedopa</code></a> — <span class="docstring-category">Function</span></summary><section><div><pre><code class="language-julia hljs">chainmapping_tedopa(parameters::Dict{&lt;:AbstractString,Any})
+chainmapping_tedopa(file::IOStream)
+chainmapping_tedopa(filename::AbstractString)</code></pre><p>Compute the frequency and coupling coefficients of the TEDOPA chain obtained by the environment specified by either the <code>parameters</code> dictionary or by an external JSON file, passed as a stream object <code>file</code> or by its name <code>filename</code>.</p><p>Return a struct whose data can be retrieved via the following methods:</p><ul><li><code>frequencies</code> for the single-site frquencies/energies;</li><li><code>couplings</code> for the coupling coefficients (the first element of the list is the coupling coefficient between the system and the first site of the chain);</li><li><code>domain</code> for the domain of the spectral density function;</li><li>the spectral density function can be accessed by calling the struct directly, as a function.</li></ul><p><strong>Example</strong></p><pre><code class="language-julia-repl hljs">julia&gt; dict = Dict(
+    &quot;environment&quot; =&gt; Dict(
+        &quot;spectral_density_parameters&quot; =&gt; [],
+        &quot;spectral_density_function&quot; =&gt; &quot;x^2&quot;,
+        &quot;domain&quot; =&gt; [0, 2],
+    ),
+    &quot;chain_length&quot; =&gt; 100,
+    &quot;PolyChaos_nquad&quot; =&gt; 200,
+);
+
+julia&gt; env = chainmapping_tedopa(dict);
+
+julia&gt; frequencies(env)
+100-element Vector{Float64}:
+ 1.4999999999999993
+ 1.1666666666666665
+ 1.083333333333333
+ 1.0499999999999998
+ 1.0333333333333332
+ ⋮
+ 1.0001073883161524
+ 1.0001051967178594
+ 1.0001030715316432
+ 1.0001010101010104
+ 1.0000990099009903
+
+julia&gt; couplings(env)
+100-element Vector{Float64}:
+ 1.632993161855452
+ 0.3872983346207419
+ 0.45074893585520914
+ 0.47245559126153397
+ 0.48241815132442156
+ ⋮
+ 0.49995252761390824
+ 0.4999535013925803
+ 0.4999544455135774
+ 0.49995536116913225
+ 0.49995624949217776
+
+julia&gt; domain(env)
+2-element Vector{Float64}:
+ 0.0
+ 2.0
+
+julia&gt; env(2)
+4</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/phaerrax/TEDOPA.jl/blob/755807ebaf216f60273ea5e6921b677eddb6791c/src/tedopa_base.jl#L26-L95">source</a></section></details></article><p>The function returns a struct <code>env</code> that contains the following data.</p><ul><li>A list of the chain mode frequencies <span>$\omega_n$</span>, that can be accessed with <code>frequencies(env)</code>.</li><li>A list of the chain mode couplings, whose first element is <span>$\eta$</span> followed by the <span>$\kappa_n$</span> coupling coefficients, and that can be retrieved with <code>couplings(env)</code>.</li><li>The domain of the spectral density function, <code>domain(env)</code>.</li><li>The spectral density function, that can be accessed simply by calling <code>env</code> itself with a real number as an argument.</li></ul><p>The last two features are clearly useless in this case, as we already know the spectral density function from the beginning, but they can be useful with the other TEDOPA methods that transform the function.</p><h2 id="Thermalised-TEDOPA"><a class="docs-heading-anchor" href="#Thermalised-TEDOPA">Thermalised TEDOPA</a><a id="Thermalised-TEDOPA-1"></a><a class="docs-heading-anchor-permalink" href="#Thermalised-TEDOPA" title="Permalink"></a></h2><p>When the environment starts from a thermal state at inverse temperature <span>$\beta$</span> and the interaction is of the form</p><p class="math-container">\[H\inter = \int_X A\sys (f_x + \adj{f_x}) \sqrt{J(x)} \,\dd x\]</p><p>then the <em>thermalised TEDOPA</em> approach may be used, in which we replace the original environment with an equivalent one with the following features.</p><ul><li>The new environment starts from the vacuum state.</li><li>Assuming the original domain is <span>$[0,x\Max]$</span>, the new environment is described by a continuum of modes <span>$g_x$</span> (following the same statistics as the <span>$f_x$</span> modes) with frequency/energy <span>$x \in [-x\Max, x\Max]$</span> and Hamiltonian operators</li></ul><p class="math-container">\[H\env&#39; = \int_{-x\Max}^{x\Max} x \adj{g_x} g_x \,\dd x\]</p><p>and</p><p class="math-container">\[H\inter&#39; = \int_{-x\Max}^{x\Max} A\sys (g_x + \adj{g_x}) \sqrt{J&#39;(x)} \,\dd x,\]</p><p>where <span>$J&#39;$</span> is the <em>thermalised</em> spectral density function</p><p class="math-container">\[J&#39;(x) = \frac12 \sgn x\, J(\abs{x}) \Bigl( 1 + \coth\frac{\beta x}{2} \Bigr)\]</p><p>for a bosonic environment, or</p><p class="math-container">\[J&#39;(x) = \frac12 J(\abs{x}) \Bigl( 1 + \tanh\frac{\beta x}{2} \Bigr)\]</p><p>for a fermionic one.</p><p>The <code>chainmapping_ttedopa</code> and <code>chainmapping_tftedopa</code> methods, for bosonic and fermionic environments respectively, return the chain coefficients and the modified spectral density function of the thermalised environment.</p><article><details class="docstring" open="true"><summary id="TEDOPA.chainmapping_ttedopa"><a class="docstring-binding" href="#TEDOPA.chainmapping_ttedopa"><code>TEDOPA.chainmapping_ttedopa</code></a> — <span class="docstring-category">Function</span></summary><section><div><pre><code class="language-julia hljs">chainmapping_ttedopa(parameters::Dict{&lt;:AbstractString, Any})
+chainmapping_ttedopa(file::IOStream)
+chainmapping_ttedopa(filename::AbstractString)</code></pre><p>Return the thermalised spectral density and the associated frequency and coupling coefficients obtained by the T-TEDOPA transformation of the environment specified by either the <code>parameters</code> dictionary or by an external JSON file, passed as a stream object <code>file</code> or by its name <code>filename</code>.</p><p>See <a href="#TEDOPA.chainmapping_tedopa"><code>chainmapping_tedopa</code></a> for more information.</p><p><strong>Example</strong></p><pre><code class="language-julia-repl hljs">julia&gt; dict = Dict(
+             &quot;environment&quot; =&gt; Dict(
+                 &quot;spectral_density_parameters&quot; =&gt; [],
+                 &quot;spectral_density_function&quot; =&gt; &quot;sqrt(x) * exp(-x/0.5)&quot;,
+                 &quot;domain&quot; =&gt; [0, 2],
+                 &quot;temperature&quot; =&gt; 2.5,
+             ),
+             &quot;chain_length&quot; =&gt; 100,
+             &quot;PolyChaos_nquad&quot; =&gt; 200,
+         );
+
+julia&gt; env = chainmapping_ttedopa(dict);
+
+julia&gt; frequencies(env)
+100-element Vector{Float64}:
+  2.7937503875293512e-8
+  0.2377475766338636
+ -0.06307177633684016
+  0.07702453114697957
+ -0.07951306693183548
+  ⋮
+  0.006497663318373198
+ -0.00645973925374582
+  0.006422260704823025
+ -0.006387253852889501
+  0.006352720782309697
+
+julia&gt; couplings(env)
+100-element Vector{Float64}:
+ 2.500086760123663
+ 0.000376728898182609
+ 1.07931125845791
+ 0.9389853648435562
+ 1.1159207167585214
+ ⋮
+ 0.9923014215388832
+ 1.0076699809013268
+ 0.9923919032035641
+ 1.0075820962595274
+ 0.9924754152732462
+
+julia&gt; domain(env)
+3-element Vector{Float64}:
+ -2.0
+ -0.0
+  2.0
+
+julia&gt; env(1.0)
+0.410505041660018</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/phaerrax/TEDOPA.jl/blob/755807ebaf216f60273ea5e6921b677eddb6791c/src/ttedopa.jl#L13-L78">source</a></section></details></article><article><details class="docstring" open="true"><summary id="TEDOPA.chainmapping_tftedopa"><a class="docstring-binding" href="#TEDOPA.chainmapping_tftedopa"><code>TEDOPA.chainmapping_tftedopa</code></a> — <span class="docstring-category">Function</span></summary><section><div><pre><code class="language-julia hljs">chainmapping_tftedopa(parameters::Dict{&lt;:AbstractString, Any})
+chainmapping_tftedopa(file::IOStream)
+chainmapping_tftedopa(filename::AbstractString)</code></pre><p>Return the thermalised spectral density and the associated frequency and coupling coefficients obtained by the TF-TEDOPA transformation of the environment specified by either the <code>parameters</code> dictionary or by an external JSON file, passed as a stream object <code>file</code> or by its name <code>filename</code>.</p><p>See <a href="#TEDOPA.chainmapping_tedopa"><code>chainmapping_tedopa</code></a> for more information.</p><p><strong>Example</strong></p><pre><code class="language-julia-repl hljs">julia&gt; dict = Dict(
+             &quot;environment&quot; =&gt; Dict(
+                 &quot;spectral_density_parameters&quot; =&gt; [],
+                 &quot;spectral_density_function&quot; =&gt; &quot;1/pi * sqrt(x*(2-x))&quot;,
+                 &quot;domain&quot; =&gt; [0, 2],
+                 &quot;temperature&quot; =&gt; 10.0,
+                 &quot;chemical_potential&quot; =&gt; 1,
+             ),
+             &quot;chain_length&quot; =&gt; 100,
+             &quot;PolyChaos_nquad&quot; =&gt; 200,
+         );
+
+julia&gt; env = chainmapping_tftedopa(dict);
+
+julia&gt; frequencies(env)
+100-element Vector{Float64}:
+  0.012494792328180852
+  5.2026993957315084e-6
+ -1.077894557975692e-9
+ -1.7277946434351792e-9
+ -1.7269887048876722e-9
+  ⋮
+  7.564160055262281e-9
+  8.971713063438136e-9
+  1.0968847909825774e-8
+  1.4329892390751997e-8
+  2.447297564427131e-8
+
+julia&gt; couplings(env)
+100-element Vector{Float64}:
+ 0.707106781448028
+ 0.499843803889265
+ 0.4999998810351929
+ 0.49999987899169407
+ 0.49999984443772305
+ ⋮
+ 0.4999988694272515
+ 0.4999990207121836
+ 0.49999920014918586
+ 0.4999994195321602
+ 0.4999997061585101
+
+julia&gt; domain(env)
+2-element Vector{Float64}:
+ -1.0
+  1.0
+
+julia&gt; env(-0.2)
+0.308760037243951</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/phaerrax/TEDOPA.jl/blob/755807ebaf216f60273ea5e6921b677eddb6791c/src/tftedopa.jl#L38-L103">source</a></section></details></article><h2 id="ThermofieldTEDOPA-(for-fermionic-environments)"><a class="docs-heading-anchor" href="#ThermofieldTEDOPA-(for-fermionic-environments)">Thermofield+TEDOPA (for fermionic environments)</a><a id="ThermofieldTEDOPA-(for-fermionic-environments)-1"></a><a class="docs-heading-anchor-permalink" href="#ThermofieldTEDOPA-(for-fermionic-environments)" title="Permalink"></a></h2><p>In the more common case of fermionic environment with an exchange-type interaction, the above thermalisation procedure is not applicable. There is another approach, based on the <em>thermofield</em> transformation: we introduce a second, ancillary environment, then we shift the dependence of the initial state of the environment on the temperature and the chemical potential to the coupling between the system and the two environments. Namely, we transform</p><p class="math-container">\[H\env = \int_X (x-\mu) \adj{f_x} f_x \,\dd x,\\
+H\inter = \int_X (\adj{A\sys} f_x + \adj{f_x} A\sys) \sqrt{J(x)} \,\dd x\]</p><p>into</p><p class="math-container">\[H\env&#39; = \int_X x (\adj{f_{0,x}} f_{0,x} + \adj{f_{1,x}} f_{1,x}) \,\dd x,\\
+H\inter&#39; = \int_X (\adj{A\sys} f_{0,x} + \adj{f_{0,x}} A\sys) \sqrt{J_0(x)} \,\dd x + \int_X (\adj{A\sys} f_{1,x} + \adj{f_{1,x}} A\sys) \sqrt{J_1(x)} \,\dd x\]</p><p>with the two new spectral density functions</p><p class="math-container">\[J_0(x) = \biggl( 1 + \frac{1}{e^{\beta(x-\mu)} + 1} \biggr) J(x),\\
+J_1(x) = \frac{1}{e^{\beta(x-\mu)} + 1} J(x).\]</p><p>The <span>$f_{0,x}$</span> modes will start from the empty state, while the <span>$f_{1,x}$</span> ones will start from the filled state.  The <code>chainmapping_thermofield</code> method returns a named tuple with two fields, <code>empty</code> and <code>filled</code>, each one referring to the chain coefficients and the modified spectral density function of the thermalised environment starting from the empty or filled state, respectively.</p><h3 id="Multiple-initial-environments"><a class="docs-heading-anchor" href="#Multiple-initial-environments">Multiple initial environments</a><a id="Multiple-initial-environments-1"></a><a class="docs-heading-anchor-permalink" href="#Multiple-initial-environments" title="Permalink"></a></h3><p>The thermofield+TEDOPA method can be also be applied when the system interacts with multiple environments at once. In order to use the algorithm in this situation, simply replace the <code>&quot;environment&quot;</code> dictionary with a <em>list of dictionaries</em>, one for each individual environment, as in the following example.</p><pre><code class="language-json hljs">{
+    &quot;environment&quot;: [
+        {
+            &quot;spectral_density_parameters&quot;: [],
+            &quot;spectral_density_function&quot;: &quot;1/(pi*200)&quot;,
+            &quot;domain&quot;: [-100, 100],
+            &quot;temperature&quot;: 0,
+            &quot;chemical_potential&quot;: 0.01
+        },
+        {
+            &quot;spectral_density_parameters&quot;: [],
+            &quot;spectral_density_function&quot;: &quot;1/(pi*200)&quot;,
+            &quot;domain&quot;: [-100, 100],
+            &quot;temperature&quot;: 0,
+            &quot;chemical_potential&quot;: -0.01
+        }
+    ],
+    &quot;chain_length&quot;: 200,
+    &quot;PolyChaos_nquad&quot;: 5000
+}</code></pre><article><details class="docstring" open="true"><summary id="TEDOPA.chainmapping_thermofield"><a class="docstring-binding" href="#TEDOPA.chainmapping_thermofield"><code>TEDOPA.chainmapping_thermofield</code></a> — <span class="docstring-category">Function</span></summary><section><div><pre><code class="language-julia hljs">chainmapping_thermofield(parameters::Dict{&lt;:AbstractString, Any})
+chainmapping_thermofield(file::IOStream)
+chainmapping_thermofield(filename::AbstractString)</code></pre><p>Return the thermalised spectral densities and the associated frequency and coupling coefficients obtained by the thermofield+TEDOPA transformation of the environment specified by either the <code>parameters</code> dictionary or by an external JSON file, passed as a stream object <code>file</code> or by its name <code>filename</code>. The returned object is a <code>NamedTuple</code> with two fields, <code>empty</code> and <code>filled</code>: the former contains the information relative to the final environment that starts from the vacuum state, the latter containes information about the completely filled state.</p><p>See <a href="#TEDOPA.chainmapping_tedopa"><code>chainmapping_tedopa</code></a> for more information.</p><p><strong>Example</strong></p><pre><code class="language-julia-repl hljs">julia&gt; dict = Dict(
+             &quot;environment&quot; =&gt; Dict(
+                 &quot;spectral_density_parameters&quot; =&gt; [],
+                 &quot;spectral_density_function&quot; =&gt; &quot;1/2pi * sqrt(x*(2-x))&quot;,
+                 &quot;domain&quot; =&gt; [0, 2],
+                 &quot;temperature&quot; =&gt; 10.0,
+                 &quot;chemical_potential&quot; =&gt; 0.5,
+             ),
+             &quot;chain_length&quot; =&gt; 50,
+             &quot;PolyChaos_nquad&quot; =&gt; 200,
+         );
+
+julia&gt; env = chainmapping_thermofield(dict);
+
+julia&gt; frequencies(env.empty)
+50-element Vector{Float64}:
+ 1.0121826824869755
+ 1.0000050727401346
+ 0.999999998949
+ 0.9999999983153369
+ 0.9999999983161233
+ ⋮
+ 0.9999999985991959
+ 0.9999999986176314
+ 0.9999999986371221
+ 0.9999999986577404
+ 0.9999999986795602
+
+julia&gt; couplings(env.filled)
+50-element Vector{Float64}:
+ 0.34910972608058455
+ 0.49983990373980103
+ 0.4999998802225264
+ 0.4999998789916133
+ 0.49999984443770995
+ ⋮
+ 0.4999984995521281
+ 0.4999984708186977
+ 0.49999844246334957
+ 0.49999841450784854
+ 0.4999983869753035
+
+julia&gt; domain(env.filled)
+2-element Vector{Float64}:
+ 0.0
+ 2.0
+
+julia&gt; env.empty(0.2)
+0.04703033939361449
+
+julia&gt; env.filled(0.2)
+0.04846262646152273</code></pre></div><a class="docs-sourcelink" target="_blank" href="https://github.com/phaerrax/TEDOPA.jl/blob/755807ebaf216f60273ea5e6921b677eddb6791c/src/thermofield.jl#L5-L73">source</a></section></details></article></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../">« Overview</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="auto">Automatic (OS)</option><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option><option value="catppuccin-latte">catppuccin-latte</option><option value="catppuccin-frappe">catppuccin-frappe</option><option value="catppuccin-macchiato">catppuccin-macchiato</option><option value="catppuccin-mocha">catppuccin-mocha</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 1.17.0 on <span class="colophon-date" title="Friday 6 March 2026 18:38">Friday 6 March 2026</span>. Using Julia version 1.12.5.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
