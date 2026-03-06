@@ -24,39 +24,22 @@ function (ce::ChainMappedEnvironment)(x)
 end
 
 """
+    chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
     chainmapping_tedopa(file::IOStream)
-
-Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment described in the JSON file `file`.
-
-See [`chainmapping_tedopa`](@ref) for more information.
-"""
-function chainmapping_tedopa(file::IOStream)
-    s = read(file, String)
-    p = JSON.parse(s)
-    parameters = merge(p, Dict("filename" => file))
-    return chainmapping_tedopa(parameters)
-end
-
-"""
     chainmapping_tedopa(filename::AbstractString)
 
-Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment described in the JSON file called `filename`.
+Compute the frequency and coupling coefficients of the TEDOPA chain obtained by the
+environment specified by either the `parameters` dictionary or by an external JSON file,
+passed as a stream object `file` or by its name `filename`.
 
-See [`chainmapping_tedopa`](@ref) for more information.
-"""
-function chainmapping_tedopa(filename::AbstractString)
-    return open(filename, "r") do inputfile
-        chainmapping_tedopa(inputfile)
-    end
-end
+Return a struct whose data can be retrieved via the following methods:
 
-"""
-    chainmapping_tedopa(parameters::Dict{<:AbstractString, Any})
-
-Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment specified by the `parameters` dictionary.
+* `frequencies` for the single-site frquencies/energies;
+* `couplings` for the coupling coefficients (the first element of the list is the coupling
+  coefficient between the system and the first site of the chain);
+* `domain` for the domain of the spectral density function;
+* the spectral density function can be accessed by calling the struct directly, as a
+  function.
 
 # Example
 
@@ -110,6 +93,21 @@ julia> env(2)
 4
 ```
 """
+function chainmapping_tedopa end
+
+function chainmapping_tedopa(file::IOStream)
+    s = read(file, String)
+    p = JSON.parse(s)
+    parameters = merge(p, Dict("filename" => file))
+    return chainmapping_tedopa(parameters)
+end
+
+function chainmapping_tedopa(filename::AbstractString)
+    return open(filename, "r") do inputfile
+        chainmapping_tedopa(inputfile)
+    end
+end
+
 function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
     n_osc = parameters["chain_length"]
     environment = parameters["environment"]

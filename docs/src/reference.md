@@ -307,8 +307,8 @@ J_1(x) = \frac{1}{e^{\beta(x-\mu)} + 1} J(x).
 
 The ``f_{0,x}`` modes will start from the empty state, while the ``f_{1,x}``
 ones will start from the filled state.  The `chainmapping_thermofield` method
-returns a dictionary with two keys, `:empty` and `:filled`, each one pointing to
-the chain coefficients and the modified spectral density function of the
+returns a named tuple with two fields, `empty` and `filled`, each one referring
+to the chain coefficients and the modified spectral density function of the
 thermalised environment starting from the empty or filled state, respectively.
 
 ### Multiple initial environments

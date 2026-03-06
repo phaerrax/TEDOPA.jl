@@ -3,14 +3,76 @@ function issingleton(domain)
 end
 
 """
+    chainmapping_thermofield(parameters::Dict{<:AbstractString, Any})
     chainmapping_thermofield(file::IOStream)
+    chainmapping_thermofield(filename::AbstractString)
 
-Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment described in the JSON file `file`, after transforming it into a
-`T=0` and `μ=0` environment through the thermofield procedure.
+Return the thermalised spectral densities and the associated frequency and coupling coefficients obtained by the thermofield+TEDOPA transformation of the environment specified by either
+the `parameters` dictionary or by an external JSON file, passed as a stream object `file` or
+by its name `filename`.
+The returned object is a `NamedTuple` with two fields, `empty` and `filled`: the former contains the information relative to the final environment that starts from the vacuum state, the latter containes information about the completely filled state.
 
 See [`chainmapping_tedopa`](@ref) for more information.
+
+# Example
+
+```julia-repl
+julia> dict = Dict(
+             "environment" => Dict(
+                 "spectral_density_parameters" => [],
+                 "spectral_density_function" => "1/2pi * sqrt(x*(2-x))",
+                 "domain" => [0, 2],
+                 "temperature" => 10.0,
+                 "chemical_potential" => 0.5,
+             ),
+             "chain_length" => 50,
+             "PolyChaos_nquad" => 200,
+         );
+
+julia> env = chainmapping_thermofield(dict);
+
+julia> frequencies(env.empty)
+50-element Vector{Float64}:
+ 1.0121826824869755
+ 1.0000050727401346
+ 0.999999998949
+ 0.9999999983153369
+ 0.9999999983161233
+ ⋮
+ 0.9999999985991959
+ 0.9999999986176314
+ 0.9999999986371221
+ 0.9999999986577404
+ 0.9999999986795602
+
+julia> couplings(env.filled)
+50-element Vector{Float64}:
+ 0.34910972608058455
+ 0.49983990373980103
+ 0.4999998802225264
+ 0.4999998789916133
+ 0.49999984443770995
+ ⋮
+ 0.4999984995521281
+ 0.4999984708186977
+ 0.49999844246334957
+ 0.49999841450784854
+ 0.4999983869753035
+
+julia> domain(env.filled)
+2-element Vector{Float64}:
+ 0.0
+ 2.0
+
+julia> env.empty(0.2)
+0.04703033939361449
+
+julia> env.filled(0.2)
+0.04846262646152273
+```
 """
+function chainmapping_thermofield end
+
 function chainmapping_thermofield(file::IOStream)
     s = read(file, String)
     p = JSON.parse(s)
@@ -18,15 +80,6 @@ function chainmapping_thermofield(file::IOStream)
     return chainmapping_thermofield(parameters)
 end
 
-"""
-    chainmapping_thermofield(filename::AbstractString)
-
-Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment described in the JSON file called `filename`, after transforming it into a
-`T=0` and `μ=0` environment through the thermofield procedure.
-
-See [`chainmapping_tedopa`](@ref) for more information.
-"""
 function chainmapping_thermofield(filename::AbstractString)
     return open(filename, "r") do inputfile
         chainmapping_thermofield(inputfile)
@@ -54,15 +107,6 @@ function prep_environments(environments::Vector{Any})
     return sdfs, Ts, μs, domains
 end
 
-"""
-    chainmapping_thermofield(parameters::Dict{<:AbstractString, Any})
-
-Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment specified by the `parameters` dictionary, after transforming it into a
-`T=0` and `μ=0` environment through the thermofield procedure.
-
-See [`chainmapping_tedopa`](@ref) for more information.
-"""
 function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
     chain_length = parameters["chain_length"]
 
@@ -130,14 +174,11 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
             Nquad=parameters["PolyChaos_nquad"],
         )
 
-        chain_coefficients = Dict(
-            :empty => ChainMappedEnvironment(
-                merged_empty_domains,
-                merged_sdfempty,
-                freqempty,
-                [sysintempty; coupempty],
+        chain_coefficients = (
+            empty=ChainMappedEnvironment(
+                merged_empty_domains, merged_sdfempty, freqempty, [sysintempty; coupempty]
             ),
-            :filled => ChainMappedEnvironment(
+            filled=ChainMappedEnvironment(
                 merged_filled_domains,
                 merged_sdffilled,
                 freqfilled,
@@ -152,14 +193,14 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
             Nquad=parameters["PolyChaos_nquad"],
         )
 
-        chain_coefficients = Dict(
-            :empty => ChainMappedEnvironment(
+        chain_coefficients = (
+            empty=ChainMappedEnvironment(
                 merged_empty_domains,
                 zero,
                 zero(freqfilled),
                 zero([sysintfilled; coupfilled]),
             ),
-            :filled => ChainMappedEnvironment(
+            filled=ChainMappedEnvironment(
                 merged_filled_domains,
                 merged_sdffilled,
                 freqfilled,
@@ -174,18 +215,12 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
             Nquad=parameters["PolyChaos_nquad"],
         )
 
-        chain_coefficients = Dict(
-            :empty => ChainMappedEnvironment(
-                merged_empty_domains,
-                merged_sdfempty,
-                freqempty,
-                [sysintempty; coupempty],
+        chain_coefficients = (
+            empty=ChainMappedEnvironment(
+                merged_empty_domains, merged_sdfempty, freqempty, [sysintempty; coupempty]
             ),
-            :filled => ChainMappedEnvironment(
-                merged_filled_domains,
-                zero,
-                zero(freqempty),
-                zero([sysintempty; coupempty]),
+            filled=ChainMappedEnvironment(
+                merged_filled_domains, zero, zero(freqempty), zero([sysintempty; coupempty])
             ),
         )
     else  # Both merged domains are singletons. There is no output.

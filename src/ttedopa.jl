@@ -11,13 +11,73 @@ function boson_thermal_factor(x, T)
 end
 
 """
+    chainmapping_ttedopa(parameters::Dict{<:AbstractString, Any})
     chainmapping_ttedopa(file::IOStream)
+    chainmapping_ttedopa(filename::AbstractString)
 
-Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment described in the JSON file `file`, after a thermalization procedure.
+Return the thermalised spectral density and the associated frequency and coupling
+coefficients obtained by the T-TEDOPA transformation of the environment specified by either
+the `parameters` dictionary or by an external JSON file, passed as a stream object `file` or
+by its name `filename`.
 
 See [`chainmapping_tedopa`](@ref) for more information.
+
+# Example
+
+```julia-repl
+julia> dict = Dict(
+             "environment" => Dict(
+                 "spectral_density_parameters" => [],
+                 "spectral_density_function" => "sqrt(x) * exp(-x/0.5)",
+                 "domain" => [0, 2],
+                 "temperature" => 2.5,
+             ),
+             "chain_length" => 100,
+             "PolyChaos_nquad" => 200,
+         );
+
+julia> env = chainmapping_ttedopa(dict);
+
+julia> frequencies(env)
+100-element Vector{Float64}:
+  2.7937503875293512e-8
+  0.2377475766338636
+ -0.06307177633684016
+  0.07702453114697957
+ -0.07951306693183548
+  ⋮
+  0.006497663318373198
+ -0.00645973925374582
+  0.006422260704823025
+ -0.006387253852889501
+  0.006352720782309697
+
+julia> couplings(env)
+100-element Vector{Float64}:
+ 2.500086760123663
+ 0.000376728898182609
+ 1.07931125845791
+ 0.9389853648435562
+ 1.1159207167585214
+ ⋮
+ 0.9923014215388832
+ 1.0076699809013268
+ 0.9923919032035641
+ 1.0075820962595274
+ 0.9924754152732462
+
+julia> domain(env)
+3-element Vector{Float64}:
+ -2.0
+ -0.0
+  2.0
+
+julia> env(1.0)
+0.410505041660018
+```
 """
+function chainmapping_ttedopa end
+
 function chainmapping_ttedopa(file::IOStream)
     s = read(file, String)
     p = JSON.parse(s)
@@ -25,28 +85,12 @@ function chainmapping_ttedopa(file::IOStream)
     return chainmapping_ttedopa(parameters)
 end
 
-"""
-    chainmapping_ttedopa(filename::AbstractString)
-
-Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment described in the JSON file called `filename`, after a thermalization procedure.
-
-See [`chainmapping_tedopa`](@ref) for more information.
-"""
 function chainmapping_ttedopa(filename::AbstractString)
     return open(filename, "r") do inputfile
         chainmapping_ttedopa(inputfile)
     end
 end
 
-"""
-    chainmapping_ttedopa(parameters::Dict{<:AbstractString, Any})
-
-Return the frequency and coupling coefficients of the TEDOPA chain obtained by the
-environment specified by the `parameters` dictionary, after a thermalization procedure.
-
-See [`chainmapping_tedopa`](@ref) for more information.
-"""
 function chainmapping_ttedopa(parameters::Dict{<:AbstractString,Any})
     n_osc = parameters["chain_length"]
     environment = parameters["environment"]
