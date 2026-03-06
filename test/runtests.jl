@@ -86,7 +86,7 @@ end
         "environment" => Dict(
             "spectral_density_parameters" => [a],
             "spectral_density_function" => semielliptic_sdf,
-            "domain" => [0.0, 2.0],
+            "domain" => [0, 2],
             "temperature" => +Inf,
             "chemical_potential" => 1,
         ),

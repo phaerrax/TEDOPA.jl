@@ -5,7 +5,7 @@ using PolyChaos
 using QuadGK
 using JSON
 
-export chainmapping, chainmapping_tedopa, couplings, frequencies, domain
+export chainmapping_tedopa, couplings, frequencies, domain
 
 include("tedopa_base.jl")
 

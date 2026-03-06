@@ -59,22 +59,55 @@ Return the frequency and coupling coefficients of the TEDOPA chain obtained by t
 environment specified by the `parameters` dictionary.
 
 # Example
+
 ```julia-repl
-julia> env = Dict(
-    "domain" => [0, 2],
-    "spectral_density_parameters" => [1, 0.5],
-    "spectral_density_function" => "sqrt((2a[2]-a[1]+x)*(2a[2]+a[1]-x))",
+julia> dict = Dict(
+    "environment" => Dict(
+        "spectral_density_parameters" => [],
+        "spectral_density_function" => "x^2",
+        "domain" => [0, 2],
+    ),
+    "chain_length" => 100,
+    "PolyChaos_nquad" => 200,
 );
-julia> p = Dict(
-    "environment" => env,
-    "chain_length" => 200,
-    "PolyChaos_nquad" => 5000,
-);
-julia> chainmapping_tedopa(p)
-(
-    frequencies=[1.0000000000000004, …, 1.000000000000001],
-    couplings=[0.22360679783266632, …, 0.49999999955894253],
-)
+
+julia> env = chainmapping_tedopa(dict);
+
+julia> frequencies(env)
+100-element Vector{Float64}:
+ 1.4999999999999993
+ 1.1666666666666665
+ 1.083333333333333
+ 1.0499999999999998
+ 1.0333333333333332
+ ⋮
+ 1.0001073883161524
+ 1.0001051967178594
+ 1.0001030715316432
+ 1.0001010101010104
+ 1.0000990099009903
+
+julia> couplings(env)
+100-element Vector{Float64}:
+ 1.632993161855452
+ 0.3872983346207419
+ 0.45074893585520914
+ 0.47245559126153397
+ 0.48241815132442156
+ ⋮
+ 0.49995252761390824
+ 0.4999535013925803
+ 0.4999544455135774
+ 0.49995536116913225
+ 0.49995624949217776
+
+julia> domain(env)
+2-element Vector{Float64}:
+ 0.0
+ 2.0
+
+julia> env(2)
+4
 ```
 """
 function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
@@ -89,11 +122,7 @@ function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
     sdf = x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)
 
     cm_freqs, cm_coups, cm_syscoup = chainmapping(
-        sdf,
-        domain,
-        n_osc - 1;
-        Nquad=parameters["PolyChaos_nquad"],
-        discretization=lanczos,
+        sdf, domain, n_osc - 1; Nquad=parameters["PolyChaos_nquad"], discretization=lanczos
     )
     return ChainMappedEnvironment(domain, sdf, cm_freqs, [cm_syscoup; cm_coups])
 end

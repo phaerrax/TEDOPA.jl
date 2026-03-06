@@ -4,110 +4,66 @@ CurrentModule = TEDOPA
 
 # TEDOPA
 
-[TEDOPA](https://github.com/phaerrax/TEDOPA.jl) is a package for computing the
-chain mapping of spectral densities of both bosonic and fermionic environments.
+*This is the documentation for the TEDOPA.jl package.*
+
+[TEDOPA](https://github.com/phaerrax/TEDOPA.jl) is a package that implements the
+Time Evolving Density operator with Orthogonal Polynomials Algorithm (TEDOPA)
+[Prior2010,Chin2010](@cite), a transformation that maps a continuous Gaussian
+environment into a discrete chain of modes.
 Starting from the spectral density function, the temperature and the chemical
-potential (if applicable), it computes the chain coefficients of the
-TEDOPA-transformed environment, applying a thermalization procedure such as
-T-TEDOPA or the thermofield transformation.
+potential (if applicable), the package computes the parameters that define the
+TEDOPA-transformed environment.
 
 ## Installation
 
-The package must be installed directly from GitHub, as it is not in any public
-registry. From the Julia REPL, type `]` to enter the Pkg REPL mode and run:
+### From a registry
+
+This package is registered in the
+[TensorNetworkSimulations](https://github.com/phaerrax/TensorNetworkSimulations)
+registry. If you haven't already done so, add it to your Julia installation by
+running
 
 ```julia
-add "https://github.com/phaerrax/TEDOPA.jl.git"
+using Pkg
+pkg"registry add https://github.com/phaerrax/TensorNetworkSimulations.git"
 ```
 
-## How to describe environments
+(this must be done just once per Julia installation). The package can then be
+installed as a normal one:
 
-Information about an environment (or a collections of environments) must be
-encoded in a JSON dictionary with the following structure:
-
-```json
-{
-    "environment": {
-        "spectral_density_parameters": [1, 0.5],
-        "spectral_density_function": "1/(10pi) * sqrt((2a[2]-a[1]+x)*(2a[2]+a[1]-x))",
-        "domain": [0, 2],
-        "temperature": 0.4,
-        "chemical_potential": 0.5
-    },
-    "chain_length": 200,
-    "PolyChaos_nquad": 5000
-}
+```julia
+using Pkg
+pkg"add TEDOPA"
 ```
 
-Each element of the `"environments"` subdictionary defines an environment as
-follows:
+### From GitHub
 
-* `"spectral_density_function"` is a string containing a valid Julia function
-  of the variable `x` and possibly a set of parameters `a[1]`, `a[2]`, etc.;
-* `"spectral_density_parameters"` is a list of numbers that will replace `a[1]`,
-  `a[2]` and so on in the spectral density function;
-* `"domain"` is the domain of the spectral density function;
-* `"temperature"` is the temperature of the environment;
-* `"chemical_potential"` is the chemical potential of the environment.
+Alternatively, straight installation from GitHub is also possible:
 
-There are then two additional parameters:
+```julia
+using Pkg
+pkg"add https://github.com/phaerrax/TEDOPA.jl"
+```
 
-* `"chain_length"` specifies the lengths of the resulting chains;
-* `"PolyChaos_nquad"` is a parameter for the numerical integration used to
-  calculate the coefficients (usually a higher number means a higher precision).
-
-## How to compute the chain coefficients
+## Package features
 
 This package offers several ways of computing the chain mapping, all derived
 from the original TEDOPA algorithm.
 
-* `chainmapping_tedopa`: standard chain mapping of a single environment;
-* `chainmapping_ttedopa`: thermalized chain mapping for bosonic environments;
-* `chainmapping_tftedopa`: single-chain thermalized chain mapping for fermionic
-  environments;
-* `chainmapping_thermofield`: a thermofield transformation and then a chain
-  mapping of the (fermionic) environment; it can also merge multiple
-  multiple environments together (in this case, the `"environment"`
-  subdictionary is replaced by a list of dictionaries, such as in the following
-  example).
+* `chainmapping_tedopa`: the standard chain mapping [Prior2010,Chin2010](@cite),
+  for a single environment.
+* `chainmapping_ttedopa`: thermalised chain mapping for a bosonic environment
+  [Tamascelli2019](@cite).
+* `chainmapping_tftedopa`: single-chain thermalised chain mapping for a
+  fermionic environment [Nuesseler2020](@cite).
+* `chainmapping_thermofield`: a thermofield transformation
+  [deVega2015](@cite) followed by a chain mapping of the resulting (fermionic)
+  environments, that can also merge multiple multiple environments together
+  [Ferracin2024](@cite).
 
-```json
-{
-    "environment": [
-        {
-            "spectral_density_parameters": [],
-            "spectral_density_function": "1/(pi*200)",
-            "domain": [-100, 100],
-            "temperature": 0,
-            "chemical_potential": 0.01
-        },
-        {
-            "spectral_density_parameters": [],
-            "spectral_density_function": "1/(pi*200)",
-            "domain": [-100, 100],
-            "temperature": 0,
-            "chemical_potential": -0.01
-        }
-    ],
-    "chain_length": 200,
-    "PolyChaos_nquad": 5000
-}
-```
+See [Reference](@ref) for a detailed explanation of the available methods.
 
-Once you have a properly formatted dictionary in a JSON file, you can call one
-of the above functions by providing a file object or a string containing the
-file name; you can also provide the dictionary itself, directly.
+## Bibliography
 
-## Chain-mapping functions
-### Core algorithm
-```@docs
-chainmapping
-```
-
-### TEDOPA variants
-```@docs
-chainmapping_tedopa
-chainmapping_ttedopa
-chainmapping_tftedopa
-chainmapping_thermofield
+```@bibliography
 ```
