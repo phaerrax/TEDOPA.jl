@@ -10,6 +10,9 @@ potential (if applicable), it computes the chain coefficients of the
 TEDOPA-transformed environment, applying a thermalisation procedure such as
 T-TEDOPA or the thermofield transformation.
 
+See [here](https://phaerrax.github.io/TEDOPA.jl/stable/) for the package
+documentation.
+
 ## Installation
 
 ### From a registry
