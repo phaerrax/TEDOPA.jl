@@ -1,3 +1,5 @@
+export chainmapping
+
 struct ChainMappedEnvironment{F<:Function}
     domain::Vector{Float64}
     spectral_density_function::F
@@ -141,47 +143,52 @@ the spectral density `J` defined over `support`.
   it can become useful to compute the integral of `J` over `support`, since the
   numerical integration algorithm may need to exclude some intermediate points
   from the domain to work (e.g. if they are singularities).
-- `L::Int`: number of oscillators in the chain.
+- `L::Int`: number of sites in the chain.
 - `Nquad::Int`: a parameter passed to OrthoPoly, which determines the number of
   nodes used for the quadrature method when numerical integration is performed.
 
 Keyword arguments are passed on to the OrthoPoly constructor of the set of
 orthogonal polynomials.
 
-It returns the tuple `(Ω,κ,η)` containing
-- the single-site energies `Ω`,
-- the coupling coefficients `κ` between oscillators,
-- the coupling coefficient `η` between the first oscillator and the system.
+It returns the tuple `(ω,κ,η)` containing
+- the single-site energies `ω`,
+- the coupling coefficients `κ` between sites,
+- the coupling coefficient `η` between the first chain site and the system.
 
 The spectral function `J` is associated to the recursion coefficients ``αₙ`` and
 ``βₙ`` which make up the recursion formula ``x πₙ(x) = πₙ₊₁(x) + αₙ πₙ(x) +
 βₙ πₙ₋₁(x)`` for the monic orthogonal polynomials ``\\{πₙ\\}_{n\\in ℕ}``
 determined by `J`. In the formula, ``π₋₁`` is the null polynomial.
 The chain coefficients are then given by
-- ``Ωᵢ = αᵢ``, with ``i\\in\\{1,\\dotsc,L\\}``,
+- ``ωᵢ = αᵢ``, with ``i\\in\\{1,\\dotsc,L\\}``,
 - ``κᵢ = \\sqrt{βᵢ₊₁}``, with ``i\\in\\{1,\\dotsc,L-1\\}``,
 while `η` is the integral of `J` over its support.
 """
 function chainmapping(J::Function, support, L::Int; kwargs...)
     measure = PolyChaos.Measure("measure", J, (support[begin], support[end]), false, Dict())
-    # We give `lanczos` as a default discretization method; if the user explicitly supplies a
-    # discretization within the keyword arguments, then this default is overwritten.
+    # We give `lanczos` as a default discretization method; if the user explicitly supplies
+    # a discretization within the keyword arguments, then this default is overwritten.
     poly = PolyChaos.OrthoPoly("poly", L, measure; discretization=lanczos, kwargs...)
-    # In order to build a series of L oscillators, we need the αᵢ and βᵢ
+    # In order to build a series of L sites, we need the αᵢ and βᵢ
     # coefficients from i=0 to i=L-1, that means α[1:L] and β[1:L].
-    # From these, the local frequencies Ωᵢ and the coupling constants κᵢ of
+    # From these, the local frequencies ωᵢ and the coupling constants κᵢ of
     # the (i,i+1) pair are given by
-    #     Ωᵢ = αᵢ            for i∈{1,…,L},
+    #     ωᵢ = αᵢ            for i∈{1,…,L},
     #     κᵢ = sqrt(βᵢ₊₁)    for i∈{1,…,L-1}.
-    # β₀ remains unused (and rightly so, since its value is implementation-defined).
-    # The oscillator-spin coupling constant η is given, lastly, by the integral
-    # of J over its support.
+    #     η = sqrt(∫ J)
+    # β₀ remains unused. Technically, it is not part of the recurrence coefficients, but
+    # libraries usually define it as the integral of the measure over its support.
+    # This is what PolyChaos does, but it seems like it's not as precise as calling quadgk
+    # directly: if we use η = sqrt(β[1]), then the tests fail, as β[1] is not equal to J's
+    # integral within the error bounds provided by quadgk.
+
     α = coeffs(poly)[:, 1]
     β = coeffs(poly)[:, 2]
-    Ω = α
+    ω = α
     κ = sqrt.(β[2:end])
     η = sqrt(quadgk(J, support...)[begin])
-    return Ω, κ, η
+    # η = sqrt(β[1])
+    return ω, κ, η
 end
 
 @inline correct_minus_00(x) = (x==0.0 ? zero(x) : x)
