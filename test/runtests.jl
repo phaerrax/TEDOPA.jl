@@ -1,5 +1,9 @@
-using Test
-using TEDOPA, QuadGK
+using Test, Documenter, TEDOPA
+using QuadGK
+
+@testset "Documentation examples" begin
+    doctest(TEDOPA; manual=false)
+end
 
 @testset "TEDOPA with truncated Ohmic (s=1) spectral density" begin
     rtol = 1e-6

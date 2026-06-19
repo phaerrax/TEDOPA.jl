@@ -38,6 +38,7 @@ makedocs(;
                         :sys => [raw"_{\mathrm{S}}"],
                         :inter => [raw"_{\mathrm{I}}"],
                         :Max => [raw"_{\mathrm{max}}"],
+                        :sb => [raw"_{#1}", 1],
                     ),
                 ),
             ),
