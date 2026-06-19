@@ -11,69 +11,36 @@ requirejs.config({
     'highlight-julia-repl': 'https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/languages/julia-repl.min',
   },
   shim: {
-  "highlight-julia": {
-    "deps": [
-      "highlight"
-    ]
-  },
-  "mathjax": {
-    "exports": "MathJax"
-  },
   "headroom-jquery": {
     "deps": [
       "jquery",
       "headroom"
     ]
   },
+  "highlight-julia": {
+    "deps": [
+      "highlight"
+    ]
+  },
   "highlight-julia-repl": {
     "deps": [
       "highlight"
     ]
+  },
+  "mathjax": {
+    "exports": "MathJax"
   }
 }});
 ////////////////////////////////////////////////////////////////////////////////
 require(['mathjax'], function(MathJax) {
 MathJax.Hub.Config({
-  "jax": [
-    "input/TeX",
-    "output/HTML-CSS",
-    "output/NativeMML"
-  ],
   "TeX": {
     "Macros": {
       "C": [
         "\\mathbb{C}"
       ],
-      "ket": [
-        "\\lvert #1 \\rangle",
-        1
-      ],
-      "sys": [
-        "_{\\mathrm{S}}"
-      ],
-      "env": [
-        "_{\\mathrm{E}}"
-      ],
-      "dd": [
-        "\\mathrm{d}"
-      ],
-      "conj": [
-        "\\overline{#1}",
-        1
-      ],
-      "inter": [
-        "_{\\mathrm{I}}"
-      ],
-      "bra": [
-        "\\langle #1 \\rvert",
-        1
-      ],
-      "real": [
-        "\\operatorname{Re}"
-      ],
-      "abs": [
-        "\\lvert #1\\rvert",
-        1
+      "Max": [
+        "_{\\mathrm{max}}"
       ],
       "N": [
         "\\mathbb{N}"
@@ -81,25 +48,73 @@ MathJax.Hub.Config({
       "R": [
         "\\mathbb{R}"
       ],
-      "norm": [
-        "\\lVert #1\\rVert",
+      "abs": [
+        "\\lvert #1\\rvert",
         1
       ],
       "adj": [
         "#1^\\dagger",
         1
       ],
-      "Max": [
-        "_{\\mathrm{max}}"
+      "bra": [
+        "\\langle #1 \\rvert",
+        1
+      ],
+      "conj": [
+        "\\overline{#1}",
+        1
+      ],
+      "dd": [
+        "\\mathrm{d}"
+      ],
+      "env": [
+        "_{\\mathrm{E}}"
       ],
       "imag": [
         "\\operatorname{Im}"
       ],
+      "inter": [
+        "_{\\mathrm{I}}"
+      ],
+      "ket": [
+        "\\lvert #1 \\rangle",
+        1
+      ],
+      "norm": [
+        "\\lVert #1\\rVert",
+        1
+      ],
+      "real": [
+        "\\operatorname{Re}"
+      ],
+      "sb": [
+        "_{#1}",
+        1
+      ],
       "sgn": [
         "\\operatorname{sgn}"
+      ],
+      "sys": [
+        "_{\\mathrm{S}}"
       ]
     }
   },
+  "config": [
+    "MMLorHTML.js"
+  ],
+  "extensions": [
+    "MathMenu.js",
+    "MathZoom.js",
+    "TeX/AMSmath.js",
+    "TeX/AMSsymbols.js",
+    "TeX/autobold.js",
+    "TeX/autoload-all.js"
+  ],
+  "jax": [
+    "input/TeX",
+    "output/HTML-CSS",
+    "output/NativeMML"
+  ],
   "tex2jax": {
     "inlineMath": [
       [
@@ -112,18 +127,7 @@ MathJax.Hub.Config({
       ]
     ],
     "processEscapes": true
-  },
-  "config": [
-    "MMLorHTML.js"
-  ],
-  "extensions": [
-    "MathMenu.js",
-    "MathZoom.js",
-    "TeX/AMSmath.js",
-    "TeX/AMSsymbols.js",
-    "TeX/autobold.js",
-    "TeX/autoload-all.js"
-  ]
+  }
 });
 
 })
