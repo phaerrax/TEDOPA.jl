@@ -108,7 +108,7 @@ function prep_environments(environments::Vector{Any})
 end
 
 function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
-    chain_length = parameters["chain_length"]
+    nsites = parameters["chain_length"]
 
     # Is parameters["environment"] a Dict{String, Any} or a Vector{Dict{String, Any}}?
     # How do we check it? We don't! We let Julia do it by passing it to a function.
@@ -164,13 +164,13 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
         (freqempty, coupempty, sysintempty) = chainmapping(
             merged_sdfempty,
             merged_empty_domains,
-            chain_length - 1;
+            nsites;
             Nquad=parameters["PolyChaos_nquad"],
         )
         (freqfilled, coupfilled, sysintfilled) = chainmapping(
             merged_sdffilled,
             merged_filled_domains,
-            chain_length - 1;
+            nsites;
             Nquad=parameters["PolyChaos_nquad"],
         )
 
@@ -189,7 +189,7 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
         (freqfilled, coupfilled, sysintfilled) = chainmapping(
             merged_sdffilled,
             merged_filled_domains,
-            chain_length - 1;
+            nsites;
             Nquad=parameters["PolyChaos_nquad"],
         )
 
@@ -211,7 +211,7 @@ function chainmapping_thermofield(parameters::Dict{<:AbstractString,Any})
         (freqempty, coupempty, sysintempty) = chainmapping(
             merged_sdfempty,
             merged_empty_domains,
-            chain_length - 1;
+            nsites;
             Nquad=parameters["PolyChaos_nquad"],
         )
 

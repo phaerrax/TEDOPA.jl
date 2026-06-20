@@ -92,7 +92,7 @@ function chainmapping_ttedopa(filename::AbstractString)
 end
 
 function chainmapping_ttedopa(parameters::Dict{<:AbstractString,Any})
-    n_osc = parameters["chain_length"]
+    nsites = parameters["chain_length"]
     environment = parameters["environment"]
 
     fn = environment["spectral_density_function"]
@@ -121,7 +121,7 @@ function chainmapping_ttedopa(parameters::Dict{<:AbstractString,Any})
     cm_freqs, cm_coups, cm_syscoup = chainmapping(
         therm_sdf,
         therm_domain,
-        n_osc - 1;
+        nsites;
         Nquad=parameters["PolyChaos_nquad"],
         discretization=lanczos,
     )

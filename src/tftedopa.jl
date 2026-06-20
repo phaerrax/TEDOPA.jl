@@ -117,7 +117,7 @@ function chainmapping_tftedopa(filename::AbstractString)
 end
 
 function chainmapping_tftedopa(parameters::Dict{<:AbstractString,Any})
-    chain_length = parameters["chain_length"]
+    nsites = parameters["chain_length"]
     environment = parameters["environment"]
 
     fn = environment["spectral_density_function"]
@@ -141,13 +141,13 @@ function chainmapping_tftedopa(parameters::Dict{<:AbstractString,Any})
     return if T == 0 && μ == 0
         # Normal TEDOPA: it's simpler.
         cm_freqs, cm_coups, cm_syscoup = chainmapping(
-            sdf, domain, chain_length - 1; Nquad=parameters["PolyChaos_nquad"]
+            sdf, domain, nsites; Nquad=parameters["PolyChaos_nquad"]
         )
         ChainMappedEnvironment(domain, sdf, cm_freqs, [cm_syscoup; cm_coups])
     else
         newJ, newdomain = tftedopa_sdf_transform(sdf, domain, T, μ)
         cm_freqs, cm_coups, cm_syscoup = chainmapping(
-            newJ, newdomain, chain_length - 1; Nquad=parameters["PolyChaos_nquad"]
+            newJ, newdomain, nsites; Nquad=parameters["PolyChaos_nquad"]
         )
         ChainMappedEnvironment(newdomain, newJ, cm_freqs, [cm_syscoup; cm_coups])
     end

@@ -111,7 +111,7 @@ function chainmapping_tedopa(filename::AbstractString)
 end
 
 function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
-    n_osc = parameters["chain_length"]
+    nsites = parameters["chain_length"]
     environment = parameters["environment"]
     domain = float(sort(environment["domain"]))
 
@@ -122,7 +122,7 @@ function chainmapping_tedopa(parameters::Dict{<:AbstractString,Any})
     sdf = x -> Base.invokelatest(tmp, environment["spectral_density_parameters"], x)
 
     cm_freqs, cm_coups, cm_syscoup = chainmapping(
-        sdf, domain, n_osc - 1; Nquad=parameters["PolyChaos_nquad"], discretization=lanczos
+        sdf, domain, nsites; Nquad=parameters["PolyChaos_nquad"], discretization=lanczos
     )
     return ChainMappedEnvironment(domain, sdf, cm_freqs, [cm_syscoup; cm_coups])
 end
@@ -150,9 +150,9 @@ the spectral density `J` defined over `support`.
 Keyword arguments are passed on to the OrthoPoly constructor of the set of
 orthogonal polynomials.
 
-It returns the tuple `(ω,κ,η)` containing
-- the single-site energies `ω`,
-- the coupling coefficients `κ` between sites,
+It returns the tuple `(ω, κ, η)` containing
+- the single-site energies `ω` of the first `L` sites,
+- the coupling coefficients `κ` between the first `L` sites,
 - the coupling coefficient `η` between the first chain site and the system.
 
 The spectral function `J` is associated to the recursion coefficients ``αₙ`` and
@@ -173,8 +173,8 @@ function chainmapping(J::Function, support, L::Int; kwargs...)
     # coefficients from i=0 to i=L-1, that means α[1:L] and β[1:L].
     # From these, the local frequencies ωᵢ and the coupling constants κᵢ of
     # the (i,i+1) pair are given by
-    #     ωᵢ = αᵢ            for i∈{1,…,L},
-    #     κᵢ = sqrt(βᵢ₊₁)    for i∈{1,…,L-1}.
+    #     ωᵢ = αᵢ            for i∈{0,…,L},
+    #     κᵢ = sqrt(βᵢ₊₁)    for i∈{0,…,L-1}.
     #     η = sqrt(∫ J)
     # β₀ remains unused. Technically, it is not part of the recurrence coefficients, but
     # libraries usually define it as the integral of the measure over its support.
@@ -182,10 +182,10 @@ function chainmapping(J::Function, support, L::Int; kwargs...)
     # directly: if we use η = sqrt(β[1]), then the tests fail, as β[1] is not equal to J's
     # integral within the error bounds provided by quadgk.
 
-    α = coeffs(poly)[:, 1]
+    α = coeffs(poly)[:, 1]  # There are L+1 elements here, since it goes from α_0 to α_L
     β = coeffs(poly)[:, 2]
-    ω = α
-    κ = sqrt.(β[2:end])
+    ω = α[1:L]
+    κ = sqrt.(β[2:L])
     η = sqrt(quadgk(J, support...)[begin])
     # η = sqrt(β[1])
     return ω, κ, η
